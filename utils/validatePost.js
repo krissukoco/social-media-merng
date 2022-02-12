@@ -67,3 +67,33 @@ module.exports.validateCreatePost = (input) => {
   const valid = errors.length === 0;
   return { valid, errors, validatedInput, userId };
 };
+
+module.exports.validateDeletePost = (token, userId) => {
+  let errors = [];
+
+  const tokenValidation = validateToken(token);
+  console.log('tokenValidation delete post: ', tokenValidation);
+  if (!tokenValidation.valid) {
+    for (let e in tokenValidation.errors) {
+      errors.push(e);
+    }
+  } else {
+    const decodedData = tokenValidation.decoded;
+    tokenUserId = decodedData.id;
+  }
+
+  // TODO: User ID from token is the same by ID provided
+  if (userId !== tokenUserId) {
+    console.log('userId: ', userId);
+    console.log('tokenUserId: ', tokenUserId);
+    errors.push(`The user ${tokenUserId} has no authorization to delete post`);
+  }
+
+  const valid = errors.length == 0 ? true : false;
+  console.log('From validateDeletePost: ', valid, errors);
+
+  return {
+    valid,
+    errors,
+  };
+};

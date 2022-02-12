@@ -35,8 +35,8 @@ module.exports = gql`
     username: String!
     bio: String!
     location: String!
-    followers: [ID!]
-    following: [ID!]
+    followers: [ID]!
+    following: [ID]!
     profilePictureUrl: String!
     createdAt: String!
     updatedAt: String!
@@ -58,6 +58,10 @@ module.exports = gql`
   type LoginRegisterResponse {
     userId: ID!
     token: String!
+  }
+  type DeletedPostResponse {
+    postId: ID!
+    deletedAt: String!
   }
 
   # INPUTS
@@ -92,16 +96,23 @@ module.exports = gql`
     imgUrls: [String]
     poll: PollInput
   }
+  input DeletePostInput {
+    postId: ID!
+    token: String!
+  }
 
   # Special types
   type Query {
     getUser(id: ID!): User!
     getPost(id: ID!): Post!
+    getPostsByUser(userId: ID!, limit: Int!): [Post]!
+    getFeedFollowing(limit: Int, token: String!): [Post]!
   }
 
   type Mutation {
     registerUser(input: RegisterInput): LoginRegisterResponse!
     loginUser(input: LoginInput): LoginRegisterResponse!
     createPost(input: CreatePostInput): Post!
+    deletePost(input: DeletePostInput): DeletedPostResponse!
   }
 `;

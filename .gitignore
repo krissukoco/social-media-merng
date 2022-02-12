@@ -1,2 +1,4 @@
 node_modules/
 config.js
+test.js
+client/node_modules

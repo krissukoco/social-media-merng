@@ -73,7 +73,7 @@ module.exports = {
       // TODO: Validate ALL input data
       const errors = validateRegister(input);
       if (errors.length !== 0) {
-        for (let i = 0; i < errors.length; i++) {
+        for (let i in errors) {
           throw new UserInputError(errors[i]);
         }
       }
