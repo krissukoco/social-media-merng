@@ -14,7 +14,7 @@ module.exports = gql`
   type Comment {
     id: ID!
     body: String!
-    user: User!
+    user: ID!
     createdAt: String!
     updatedAt: String!
   }
@@ -101,7 +101,7 @@ module.exports = gql`
     token: String!
   }
 
-  # Special types
+  # Queries & Mutations
   type Query {
     getUser(id: ID!): User!
     getPost(id: ID!): Post!

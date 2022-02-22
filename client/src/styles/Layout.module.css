@@ -1,0 +1,43 @@
+.navContainer {
+  width: 100%;
+  background-color: white;
+}
+
+.navbar {
+  padding: 0.5rem 2rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  min-height: 4rem;
+}
+
+.navMenu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0 0 auto;
+}
+
+.navMenu > * {
+  margin: 0 0.5rem;
+}
+
+.footer {
+  background-color: skyblue;
+  color: white;
+  margin: 3rem 0 0 0;
+  padding: 2rem 2rem;
+  justify-content: center;
+  text-align: center;
+}
+
+.container {
+  padding: 0.5rem 2rem;
+  margin: 0 auto;
+  max-width: 72rem;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 4rem;
+}

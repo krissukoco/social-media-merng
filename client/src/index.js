@@ -5,10 +5,10 @@ import App from './App';
 // import reportWebVitals from './reportWebVitals';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
-import { SERVER } from './config';
+import { GRAPHQL_SERVER } from './config';
 
 const client = new ApolloClient({
-  uri: SERVER,
+  uri: GRAPHQL_SERVER,
   cache: new InMemoryCache(),
 });
 

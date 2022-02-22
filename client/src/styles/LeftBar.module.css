@@ -1,0 +1,57 @@
+.container {
+  background-color: white;
+  margin: 0 1rem;
+  padding: 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  max-height: fit-content;
+}
+
+.imgUser {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  justify-content: center;
+  margin: 1rem auto;
+}
+
+.fullname {
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.location {
+  padding-bottom: 10px;
+  color: grey;
+  font-size: 0.9rem;
+}
+
+.bio {
+  font-size: 0.95rem;
+}
+
+.userConnectionContainer {
+  display: flex;
+  flex-direction: row;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+}
+
+.userConnection {
+  padding: 1rem 0;
+}
+
+.userConnection > h1 {
+  font-weight: bold;
+  padding: 0 0.5rem;
+  color: grey;
+}
+
+a:hover {
+  background-color: rgba(245, 245, 245, 0.65);
+  transition: 0.5s;
+}
