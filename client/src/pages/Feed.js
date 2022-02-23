@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 
 import MainLayout from '../components/MainLayout';
 import LeftBar from '../components/feed/LeftBar';
@@ -8,24 +8,22 @@ import NewPost from '../components/feed/NewPost';
 import styles from '../styles/Feed.module.css';
 
 import dummyFeeds from '../misc/dummyFeeds';
+import userDetailDummy from '../misc/dummyUser';
 
-// Placeholder, for developing components
-const userDetail = {
-  id: '00000',
-  username: 'leomessi',
-  fullname: 'Lionel Messi',
-  email: 'leomessi@parisfc.com',
-  bio: "<p>Playmaker, Free Kick KING. <br> 7 times Ballon D'Or</p>",
-  location: 'Rosario, Argentina',
-  followers: ['12345', '23456', '34567', '45678'],
-  following: ['11111'],
-  profilePictureUrl:
-    'https://upload.wikimedia.org/wikipedia/commons/c/c1/Lionel_Messi_20180626.jpg',
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
+const EmptyDiv = () => {
+  return <div style={{ minHeight: '2rem' }}></div>;
 };
 
 const Feed = () => {
+  const [userDetail, setUserDetail] = useState(null);
+
+  // ------- TODO: DELETE AFTER DEVELOPMENT
+  //               Change with getting data from API
+  useEffect(() => {
+    setUserDetail(userDetailDummy);
+  }, [userDetail]);
+  // -------
+
   return (
     <div>
       <MainLayout>
@@ -35,10 +33,14 @@ const Feed = () => {
           </div>
 
           <div className={styles.feed}>
-            <NewPost
-              userId={userDetail.id}
-              profPic={userDetail.profilePictureUrl}
-            />
+            {userDetail == null ? (
+              <EmptyDiv />
+            ) : (
+              <NewPost
+                userId={userDetail.id}
+                profPic={userDetail.profilePictureUrl}
+              />
+            )}
             {dummyFeeds.map((feed) => (
               <FeedItem key={feed.id} feed={feed} />
             ))}

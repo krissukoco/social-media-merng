@@ -30,7 +30,7 @@ const LeftBar = ({ userDetail }) => {
       </div>
     );
   } else {
-    return <div>SKELETON</div>;
+    return <div></div>;
   }
 };
 

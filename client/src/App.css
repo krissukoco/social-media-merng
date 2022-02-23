@@ -1,3 +1,8 @@
 :root {
   --blue-primary: #38b6ff;
 }
+
+a:hover {
+  background-color: inherit;
+  color: inherit;
+}

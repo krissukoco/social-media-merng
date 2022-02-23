@@ -18,9 +18,11 @@ function App() {
         <Route index element={<Home />} />
         <Route path='/feed' element={<Feed />} />
         <Route path='/post' element={<Post />} />
-        <Route path='/user' element={<User />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/signup' element={<Signup />} />
+        <Route path='/user' element={<User />}>
+          <Route path=':id' element={<User />} />
+        </Route>
+        <Route path='/login' element={<Login page='login' />} />
+        <Route path='/signup' element={<Login page='signup' />} />
         <Route path='/settings' element={<Settings />} />
       </Routes>
     </Router>

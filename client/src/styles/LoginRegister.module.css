@@ -1,0 +1,100 @@
+:root {
+  --primary-blue-color: #38b6ff;
+  --hover-blue-color: #2b8ec7;
+  --hover-blue-secondary: #8accf1;
+}
+
+.page {
+  display: flex;
+  flex-direction: row;
+  min-height: 50rem;
+}
+
+.imgContainer {
+  width: 100%;
+  /* background: linear-gradient(
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.5),
+    url('../sportify-login-background.jpg')
+  ); */
+  background-image: url('../sportify-login-background.jpg');
+  background-size: cover;
+  background-position: center center;
+  color: black;
+}
+
+.logo {
+  width: 500px;
+  justify-self: center;
+}
+
+.mainContainer {
+  justify-items: center;
+  align-items: center;
+  text-align: center;
+  margin: 7rem 0;
+  padding: 2rem 5rem;
+  width: 60%;
+  min-width: 600px;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  margin: auto auto;
+  padding: 2rem 3rem;
+  max-width: 500px;
+}
+
+.input {
+  padding: 1rem 1rem 1rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  border: 0.5px solid grey;
+  outline: none;
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: 1px solid black;
+  transition: 0.5s ease-in-out;
+}
+
+.mainButton {
+  cursor: pointer;
+  background-color: var(--primary-blue-color);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  width: 200px;
+  padding: 1rem 1rem;
+  margin: 1rem auto 2rem auto;
+  border: none;
+  border-radius: 20px;
+}
+
+.mainButton:hover {
+  background-color: var(--hover-blue-color);
+  transition: 0.5s ease-in-out;
+}
+
+.secondaryButton {
+  cursor: pointer;
+  background-color: white;
+  outline: 0.5px solid var(--primary-blue-color);
+  border: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  width: 200px;
+  padding: 1rem 1rem;
+  margin: 1rem auto;
+  border-radius: 20px;
+}
+
+.secondaryButton:hover {
+  background-color: var(--hover-blue-secondary);
+  transition: 0.5s ease-in-out;
+}

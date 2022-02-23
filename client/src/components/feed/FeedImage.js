@@ -71,7 +71,11 @@ const FeedImage = ({ imgUrls }) => {
     <div className={styles.postImageContainer}>
       <img
         src={imgUrls[imgIndex]}
-        style={{ width: '100%', transition: 'opacity 0.6s ease-in-out' }}
+        style={{
+          width: '100%',
+          transition: 'opacity 0.6s ease-in-out',
+          zIndex: 1,
+        }}
       />
       <SliderArrow type='previous' />
       <SliderArrow type='next' />

@@ -23,14 +23,15 @@ const FeedItem = ({ feed }) => {
   const [likesCount, setLikesCount] = useState(feed.likes.length);
   const [openComments, setOpenComments] = useState(false);
 
-  const likeHandler = () => {
+  const likeHandler = (e) => {
+    e.preventDefault();
     setIsLiked(!isLiked);
     if (!isLiked) {
       setLikesCount(likesCount + 1);
     } else {
       setLikesCount(likesCount - 1);
     }
-    // Sync with DB
+    // TODO: Sync with DB
   };
 
   return (
@@ -84,7 +85,7 @@ const FeedItem = ({ feed }) => {
                 alignItems: 'center',
                 margin: '0 3rem',
               }}
-              onClick={() => likeHandler()}
+              onClick={(e) => likeHandler(e)}
             >
               <LikeIcon
                 style={{
@@ -105,7 +106,10 @@ const FeedItem = ({ feed }) => {
                 alignItems: 'center',
                 margin: '0 3rem',
               }}
-              onClick={() => setOpenComments(!openComments)}
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenComments(!openComments);
+              }}
             >
               <CommentIcon
                 style={{ width: '20px', height: '20px', margin: '0 5px' }}

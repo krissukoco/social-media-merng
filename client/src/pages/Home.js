@@ -1,12 +1,16 @@
-import React from 'react';
+import { useEffect } from 'react';
+
+import MainLayout from '../components/MainLayout';
 
 const Home = () => {
   return (
-    <div>
-      <h1 className='title has-text-centered'>
-        HOME PAGE - Linkedin-like (not feeds)
-      </h1>
-    </div>
+    <MainLayout>
+      <div>
+        <h1 className='title has-text-centered'>
+          HOME PAGE - Linkedin-like (not feeds)
+        </h1>
+      </div>
+    </MainLayout>
   );
 };
 
