@@ -1,16 +1,22 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import 'bulma/css/bulma.min.css';
 
 import UserIcon from '../components/navbar/UserIcon';
 import dummyUser from '../misc/dummyUser';
-// TODO: Change dummyUser with GET_USER_DETAIL from JWT on http header
 
 import styles from '../styles/Navbar.module.css';
-import logo from '../logo-horizontal.png';
+import logo from '../media/logo-horizontal.png';
 
-export default function Navbar({ userDetail }) {
+export default function Navbar() {
+  const [userDetail, setUserDetail] = useState(null);
+
+  useEffect(() => {
+    // TODO: Change dummyUser with GET_USER_DETAIL from JWT on http header
+    // setUserDetail(dummyUser);
+    setUserDetail(null);
+  });
   let navigate = useNavigate();
 
   return (
@@ -25,19 +31,19 @@ export default function Navbar({ userDetail }) {
           <div className={styles.navMenu}>
             {/* <a className='navbar-item'>Feed</a>
             <a className='navbar-item'>About</a> */}
-            {userDetail == null ? (
+            {userDetail != null ? (
               <UserIcon userDetail={dummyUser} />
             ) : (
               <>
                 <button
                   onClick={() => navigate('/login')}
-                  className='button is-light is-responsive'
+                  className={`${styles.login} ${styles.myButton}`}
                 >
                   Login
                 </button>
                 <button
                   onClick={() => navigate('/signup')}
-                  className='button is-primary is-responsive'
+                  className={`${styles.signup} ${styles.myButton}`}
                 >
                   Sign Up
                 </button>
@@ -46,7 +52,7 @@ export default function Navbar({ userDetail }) {
           </div>
         </nav>
       </div>
-      <div style={{ minHeight: '6.5rem' }}></div>
+      <div style={{ minHeight: '5.7rem' }}></div>
     </>
   );
 }

@@ -1,5 +1,9 @@
 :root {
-  --blue-primary: #38b6ff;
+  --primary-blue-color: #38b6ff;
+  --darker-blue-color: #329cda;
+  --hover-blue-color: #2b8ec7;
+  --hover-blue-secondary: #8accf1;
+  --light-grey: rgb(163, 162, 162);
 }
 
 a:hover {

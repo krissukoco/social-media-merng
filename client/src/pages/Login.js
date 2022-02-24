@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import Footer from '../components/Footer';
 import styles from '../styles/LoginRegister.module.css';
-import logo from '../logo-horizontal.png';
+import logo from '../media/logo-horizontal.png';
 
 const ErrorCard = (error) => {
   return (

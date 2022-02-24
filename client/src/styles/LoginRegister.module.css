@@ -1,8 +1,4 @@
-:root {
-  --primary-blue-color: #38b6ff;
-  --hover-blue-color: #2b8ec7;
-  --hover-blue-secondary: #8accf1;
-}
+@import '../App.css';
 
 .page {
   display: flex;
@@ -17,7 +13,7 @@
     rgba(0, 0, 0, 0.5),
     url('../sportify-login-background.jpg')
   ); */
-  background-image: url('../sportify-login-background.jpg');
+  background-image: url('../media/sportify-login-background.jpg');
   background-size: cover;
   background-position: center center;
   color: black;
@@ -57,8 +53,8 @@
 }
 
 .input:focus {
-  outline: 1px solid black;
-  transition: 0.5s ease-in-out;
+  border: 0.5px solid var(--darker-blue-color);
+  transition: 0.2s ease-in-out;
 }
 
 .mainButton {
@@ -77,7 +73,7 @@
 
 .mainButton:hover {
   background-color: var(--hover-blue-color);
-  transition: 0.5s ease-in-out;
+  transition: 0.3s ease-in-out;
 }
 
 .secondaryButton {
@@ -96,5 +92,6 @@
 
 .secondaryButton:hover {
   background-color: var(--hover-blue-secondary);
-  transition: 0.5s ease-in-out;
+  color: white;
+  transition: 0.3s ease-in-out;
 }
