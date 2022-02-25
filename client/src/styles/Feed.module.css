@@ -4,6 +4,11 @@ a {
   color: inherit;
 }
 
+a:hover {
+  background-color: inherit;
+  color: inherit;
+}
+
 .feedContainer {
   display: flex;
   flex-direction: row;

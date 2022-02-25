@@ -56,7 +56,10 @@ const FeedImage = ({ imgUrls }) => {
       const right = type == 'next' ? '0' : null;
       return (
         <a
-          onClick={() => changeImage(n)}
+          onClick={(e) => {
+            e.stopPropagation();
+            changeImage(n);
+          }}
           style={{ position: 'absolute', top: '45%', left, right }}
         >
           {arrow}

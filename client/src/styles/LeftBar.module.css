@@ -1,3 +1,13 @@
+@import '../App.css';
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
+a:hover {
+  background-color: inherit;
+}
+
 .container {
   background-color: white;
   margin: 0 1rem;
@@ -19,13 +29,19 @@
 }
 
 .fullname {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   text-transform: uppercase;
   font-weight: bold;
 }
 
+.username {
+  font-size: 1rem;
+  color: var(--darker-blue-color);
+  margin-bottom: 0.5rem;
+}
+
 .location {
-  padding-bottom: 10px;
+  padding-bottom: 20px;
   color: grey;
   font-size: 0.9rem;
 }
@@ -43,6 +59,11 @@
 
 .userConnection {
   padding: 1rem 0;
+}
+
+.useConnection:hover {
+  background-color: whitesmoke;
+  transition: 0.2s;
 }
 
 .userConnection > h1 {

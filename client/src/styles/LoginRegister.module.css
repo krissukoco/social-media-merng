@@ -31,7 +31,9 @@
   margin: 7rem 0;
   padding: 2rem 5rem;
   width: 60%;
-  min-width: 600px;
+  min-width: 500px;
+  max-width: 700px;
+  min-height: 900px;
 }
 
 .inputContainer {
@@ -49,11 +51,15 @@
   border-radius: 10px;
   border: 0.5px solid grey;
   outline: none;
-  font-size: 1rem;
+  font-size: 0.9rem;
+}
+
+.input::placeholder {
+  font-size: 0.8rem;
 }
 
 .input:focus {
-  border: 0.5px solid var(--darker-blue-color);
+  border: 1px solid var(--darker-blue-color);
   transition: 0.2s ease-in-out;
 }
 
@@ -94,4 +100,19 @@
   background-color: var(--hover-blue-secondary);
   color: white;
   transition: 0.3s ease-in-out;
+}
+
+.errorCard {
+  background-color: red;
+  color: white;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
+
+.errorList {
+  list-style: square;
+  padding: 0 1rem;
+  text-align: left;
 }

@@ -52,10 +52,10 @@ a:hover {
 }
 
 .login:hover {
-  border: 0.5px solid whitesmoke;
+  border: 1px solid whitesmoke;
   font-weight: bold;
   background-color: whitesmoke;
-  transition: 0.3s ease-in-out;
+  transition: 0.2s ease-in-out;
 }
 
 .signup {
@@ -66,7 +66,7 @@ a:hover {
 .signup:hover {
   background-color: var(--hover-blue-color);
   font-weight: bold;
-  transition: 0.3s ease-in-out;
+  transition: 0.2s ease-in-out;
 }
 
 /* userIcon */

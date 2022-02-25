@@ -2,13 +2,13 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import 'bulma/css/bulma.min.css';
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 
 import Home from './pages/Home';
 import Feed from './pages/Feed';
 import Post from './pages/Post';
 import User from './pages/User';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
+import Login from './pages/LoginRegister';
 import Settings from './pages/Settings';
 
 function App() {

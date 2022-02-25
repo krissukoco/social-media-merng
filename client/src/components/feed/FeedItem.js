@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { FaRegComment as CommentIcon } from 'react-icons/fa';
 import { AiFillLike as LikeIcon } from 'react-icons/ai';
 
@@ -18,13 +19,17 @@ const userDetail = {
 // =====
 
 const FeedItem = ({ feed }) => {
+  // TODO: GET user data from GraphQL API
   const [isLiked, setIsLiked] = useState(false);
   const [commentsCount, setCommentsCount] = useState(feed.comments.length);
   const [likesCount, setLikesCount] = useState(feed.likes.length);
   const [openComments, setOpenComments] = useState(false);
 
+  const navigate = useNavigate();
+
   const likeHandler = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsLiked(!isLiked);
     if (!isLiked) {
       setLikesCount(likesCount + 1);
@@ -35,7 +40,14 @@ const FeedItem = ({ feed }) => {
   };
 
   return (
-    <a href='#'>
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        e.bubbles = false;
+        console.log(e);
+        navigate(`/post/${feed.id}`);
+      }}
+    >
       <div
         className={styles.feedItemContainer}
         style={{
@@ -43,7 +55,7 @@ const FeedItem = ({ feed }) => {
           transition: 'max-height 2s',
         }}
       >
-        <div style={{ padding: '0 0rem' }}>
+        <a style={{ padding: '0 0rem' }} href={`/user/${userDetail.id}`}>
           <img
             src={userDetail.profilePictureUrl}
             alt={userDetail.fullname}
@@ -54,13 +66,16 @@ const FeedItem = ({ feed }) => {
               borderRadius: '50%',
             }}
           />
-        </div>
+        </a>
 
         <div className={styles.itemDetails}>
           <div className={styles.itemUser}>
-            <div className='has-text-weight-bold mr-2'>
+            <a
+              className='has-text-weight-bold mr-2'
+              href={`/user/${userDetail.id}`}
+            >
               {userDetail.fullname}
-            </div>
+            </a>
             <div>
               <a className='has-text-info-dark'>@{userDetail.username}</a>
             </div>
@@ -108,6 +123,7 @@ const FeedItem = ({ feed }) => {
               }}
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 setOpenComments(!openComments);
               }}
             >
@@ -122,11 +138,9 @@ const FeedItem = ({ feed }) => {
           {/* Comments section */}
           <div
             style={{
-              visibility: openComments ? 'visible' : 'hidden',
               opacity: openComments ? '1' : '0',
-              maxHeight: openComments ? 'max-content' : '0',
-              minHeight: openComments ? 'fit-content' : '0',
-              transition: 'all 1s',
+              maxHeight: openComments ? 'fit-content' : '0',
+              transition: 'all 0.5s',
               overflow: 'hidden',
             }}
           >
@@ -134,7 +148,7 @@ const FeedItem = ({ feed }) => {
           </div>
         </div>
       </div>
-    </a>
+    </div>
   );
 };
 
