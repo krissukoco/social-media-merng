@@ -7,6 +7,7 @@ const {
   validateRegister,
   validateLogin,
 } = require('../../utils/validateUserInputs');
+const { validateToken } = require('../../utils/validateToken');
 const { SECRET_KEY } = require('../../config');
 
 const generateToken = (id, expiresInStr) => {
@@ -58,15 +59,36 @@ module.exports = {
         );
       }
 
-      // TODO: Make sure password IS NOT SENT BACK
-      const { password, updatedAt, ...user } = res._doc;
-      console.log('User: ', user);
+      // DO NOT SEND protected data
+      const { password, _id, ...user } = res._doc;
+      const resolve = { ...user, id: res._doc._id };
+      console.log('Resolve: ', resolve);
 
-      return user;
+      return resolve;
+    },
+
+    async getSelf(_, vars, { req }) {
+      const token =
+        req.headers.authorization == 'null' ? '' : req.headers.authorization;
+      console.log('getSelf token: ', token);
+      const { valid, decoded, errors } = validateToken(token);
+      if (!valid) {
+        return;
+      }
+
+      const id = decoded.id;
+      const res = await User.findById(id);
+      if (!res) {
+        throw new UserInputError('Account does not exist');
+      } else {
+        const { password, _id, ...user } = res._doc;
+        const resolve = { ...user, id: res._doc._id };
+        return resolve;
+      }
     },
   },
   Mutation: {
-    // registerUser(parents, args, context, info)
+    // STRUCTURE: resolverFunc(parents, args, context, info)
     async registerUser(_, { input }) {
       const { fullname, email, username, password, confirmPassword } = input;
 

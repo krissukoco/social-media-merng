@@ -1,32 +1,37 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import useOutsideClick from '../../utils/useOutsideClick';
+import onLogout from '../../utils/onLogout';
 import styles from '../../styles/Navbar.module.css';
+import noProfpic from '../../media/no-profpic.png';
 
-const Option = ({ text, to, style }) => {
+const Option = ({ children, text, onClick, style }) => {
   return (
-    <a href={to} className={styles.navbarIconOption} style={style}>
-      {text}
+    <a className={styles.navbarIconOption} style={style} onClick={onClick}>
+      {children}
     </a>
   );
 };
 
 const Dropdown = ({ userDetail }) => {
+  let navigate = useNavigate();
+
+  const profpic = userDetail.profilePictureUrl || noProfpic;
   return (
     <div className={styles.dropdown}>
       <a href={`/user/${userDetail.id}`} className={styles.dropdownUser}>
-        <img
-          src={userDetail.profilePictureUrl}
-          className={styles.dropdownUserImg}
-        />
+        <img src={profpic} className={styles.dropdownUserImg} />
         <div className={styles.dropdownName}>
           <h3>@{userDetail.username}</h3>
           <h4>{userDetail.fullname}</h4>
         </div>
       </a>
       <div className={styles.dropPlaceholder}></div>
-      {/* TODO: CHANGE "to" to the real target/route */}
-      <Option text='Log Out' to='#' style={{ color: 'red' }} />
+      <Option onClick={() => navigate('/settings')}>Settings</Option>
+      <Option onClick={onLogout} style={{ color: 'red' }}>
+        Log Out
+      </Option>
     </div>
   );
 };
@@ -35,10 +40,16 @@ const UserIcon = ({ userDetail }) => {
   const [isOpen, setiIsOpen] = useState(false);
   const ref = useOutsideClick(setiIsOpen);
 
+  const profpic = userDetail.profilePictureUrl || noProfpic;
+
   return (
-    <a onClick={() => setiIsOpen(!isOpen)} ref={ref}>
+    <div
+      onClick={() => setiIsOpen(!isOpen)}
+      ref={ref}
+      style={{ cursor: 'pointer' }}
+    >
       <img
-        src={userDetail.profilePictureUrl}
+        src={profpic}
         style={{
           width: '45px',
           height: '45px',
@@ -47,7 +58,7 @@ const UserIcon = ({ userDetail }) => {
         }}
       />
       {isOpen && <Dropdown userDetail={userDetail} />}
-    </a>
+    </div>
   );
 };
 

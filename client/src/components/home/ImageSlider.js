@@ -1,14 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Transition } from 'react-transition-group';
 
 import styles from '../../styles/Home.module.css';
 
 const ImageSlider = ({ images }) => {
   const [sliderIndex, setSliderIndex] = useState(0);
-
-  if (!images) {
-    return <div></div>;
-  }
 
   const getNextIndex = (currentIdx) => {
     let imagesLen = images.length;
@@ -25,16 +21,23 @@ const ImageSlider = ({ images }) => {
 
   let nextIndex = getNextIndex(sliderIndex);
 
-  setTimeout(() => setSliderIndex(nextIndex), 5000);
+  useEffect(() => {
+    let timer = setTimeout(() => setSliderIndex(nextIndex), 5000);
+    // To remove React error -> unsubscribe when component unmounts
+    return () => clearTimeout(timer);
+  }, [sliderIndex]);
+
   return (
     <div className={styles.sliderContainer}>
-      <img
-        alt='Spority: Share your sport pictures'
-        src={images[sliderIndex]}
-        className={styles.sliderImg}
-        style={{}}
-        key={sliderIndex}
-      />
+      {images ? (
+        <img
+          alt='Spority: Share your sport pictures'
+          src={images[sliderIndex]}
+          className={styles.sliderImg}
+          style={{}}
+          key={sliderIndex}
+        />
+      ) : null}
     </div>
   );
 };

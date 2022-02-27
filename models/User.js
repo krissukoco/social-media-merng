@@ -41,6 +41,7 @@ const userSchema = new mongoose.Schema({
   bio: { type: String, default: '' },
   location: { type: String, default: '' },
   profilePictureUrl: { type: String, default: '' },
+  bgPictureUrl: { type: String, default: '' },
   createdAt: {
     type: String,
     default: () => new Date().toISOString(),

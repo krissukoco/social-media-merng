@@ -62,8 +62,8 @@ const CommentSection = ({ comments }) => {
       <h3 style={{ fontSize: '0.9rem', color: 'grey' }}>
         Showing {countString(comments.length)} comments
       </h3>
-      {comments.map((comment) => (
-        <CommentItem comment={comment} />
+      {comments.map((comment, i) => (
+        <CommentItem key={i} comment={comment} />
       ))}
     </div>
   );

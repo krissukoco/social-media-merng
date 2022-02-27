@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router';
 import { useMutation, gql } from '@apollo/client';
 import ReactHrmlParser from 'react-html-parser';
@@ -7,25 +7,21 @@ import Footer from '../components/Footer';
 import LoginInput from '../components/loginRegister/LoginInput';
 import SignupInput from '../components/loginRegister/SignupInput';
 import { LOGIN_USER, REGISTER_USER } from '../graphql/mutations';
+import {
+  getLocalData,
+  saveLocalData,
+  deleteLocalData,
+} from '../utils/handleUserAuth';
+import UserContext from '../context/UserContext';
 import styles from '../styles/LoginRegister.module.css';
 import logo from '../media/logo-horizontal.png';
 
 import texts from '../misc/copywritingLogin';
-import spinnerWhite from '../media/loading-spinner-white.gif';
 import spinnerBlue from '../media/loading-spinner-blue.gif';
 
 const ErrorCard = ({ errors }) => {
   return (
     <div className={styles.errorCard}>
-      {/* <h2
-        style={{
-          textAlign: 'left',
-          fontWeight: 'bold',
-          marginBottom: '0.5rem',
-        }}
-      >
-        Please fix following inputs:{' '}
-      </h2> */}
       <ul className={styles.errorList}>
         {errors.map((e, i) => (
           <li key={i}>{e}</li>
@@ -47,14 +43,13 @@ const LoginRegister = ({ page }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState([]);
   const [text, setText] = useState(getTexts(pageType));
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // TODO: CHANGE to check token in localStorage instead
-  if (isLoggedIn) {
-    navigate('/feed');
-  }
-
+  // Initialize page
   useEffect(() => {
+    let token = getLocalData().token;
+    if (token) {
+      window.location.replace('/feed');
+    }
     if (!page) {
       setPageType('login');
     } else if (page === 'login' || page === 'signup') {
@@ -63,7 +58,7 @@ const LoginRegister = ({ page }) => {
       setPageType('login');
       console.log("page type not supported. Returning 'login'");
     }
-  }, []);
+  }, [pageType]);
 
   // When page change from Log In to Sign Up and vv
   useEffect(() => {
@@ -78,16 +73,15 @@ const LoginRegister = ({ page }) => {
     setErrors(newErrors);
   }
 
-  // TODO: CHANGE to save token to localStorage
+  // If login/signup is success
   function onSuccess(result) {
     const { userId, token } = result;
-
-    // SAVE TOKEN HERE
-    // setToken(`Bearer ${token}`);
-
-    setIsLoggedIn(true);
+    deleteLocalData();
+    saveLocalData(userId, token);
+    window.location.replace('/feed');
   }
 
+  // Two utilities to register/login user
   const [
     registerUser,
     { registerData, loading: registerLoading, error: registerError },

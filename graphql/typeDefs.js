@@ -38,6 +38,7 @@ module.exports = gql`
     followers: [ID]!
     following: [ID]!
     profilePictureUrl: String!
+    bgPictureUrl: String!
     createdAt: String!
     updatedAt: String!
   }
@@ -103,6 +104,7 @@ module.exports = gql`
 
   # Queries & Mutations
   type Query {
+    getSelf: User
     getUser(id: ID!): User!
     getPost(id: ID!): Post!
     getPostsByUser(userId: ID!, limit: Int!): [Post]!

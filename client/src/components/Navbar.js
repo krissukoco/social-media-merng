@@ -1,22 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import 'bulma/css/bulma.min.css';
 
+import UserContext from '../context/UserContext';
 import UserIcon from '../components/navbar/UserIcon';
 import dummyUser from '../misc/dummyUser';
+import useClientDetail from '../hooks/useClientDetail';
 
 import styles from '../styles/Navbar.module.css';
 import logo from '../media/logo-horizontal.png';
 
-export default function Navbar() {
-  const [userDetail, setUserDetail] = useState(null);
+export default function Navbar({ userDetail }) {
+  // TODO: Change dummyUser with GET_USER_DETAIL from JWT on http header
 
-  useEffect(() => {
-    // TODO: Change dummyUser with GET_USER_DETAIL from JWT on http header
-    // setUserDetail(dummyUser);
-    setUserDetail(null);
-  });
   let navigate = useNavigate();
 
   return (
@@ -32,7 +29,7 @@ export default function Navbar() {
             {/* <a className='navbar-item'>Feed</a>
             <a className='navbar-item'>About</a> */}
             {userDetail != null ? (
-              <UserIcon userDetail={dummyUser} />
+              <UserIcon userDetail={userDetail} />
             ) : (
               <>
                 <button

@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 import MainLayout from '../components/MainLayout';
 import LeftBar from '../components/feed/LeftBar';
 import RightBar from '../components/feed/RightBar';
 import FeedItem from '../components/feed/FeedItem';
 import NewPost from '../components/feed/NewPost';
+
+import UserContext from '../context/UserContext';
 import styles from '../styles/Feed.module.css';
 
 import dummyFeeds from '../misc/dummyFeeds';
@@ -15,14 +17,16 @@ const EmptyDiv = () => {
 };
 
 const Feed = () => {
-  const [userDetail, setUserDetail] = useState(null);
+  // const [userDetail, setUserDetail] = useState();
 
-  // ------- TODO: DELETE AFTER DEVELOPMENT
-  //               Change with getting data from API
-  useEffect(() => {
-    setUserDetail(userDetailDummy);
-  }, [userDetail]);
-  // -------
+  // // ------- TODO: DELETE AFTER DEVELOPMENT
+  // //               Change with getting data from API
+  // useEffect(() => {
+  //   setUserDetail(userDetailDummy);
+  // }, [userDetail]);
+  // // -------
+
+  const { userDetail, _ } = useContext(UserContext);
 
   return (
     <div>
@@ -36,13 +40,10 @@ const Feed = () => {
             {userDetail == null ? (
               <EmptyDiv />
             ) : (
-              <NewPost
-                userId={userDetail.id}
-                profPic={userDetail.profilePictureUrl}
-              />
+              <NewPost userDetail={userDetail} />
             )}
             {dummyFeeds.map((feed) => (
-              <FeedItem key={feed.id} feed={feed} />
+              <FeedItem key={feed.id} feed={feed} alwaysOpen={false} />
             ))}
           </div>
 

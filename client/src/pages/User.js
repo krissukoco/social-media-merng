@@ -7,11 +7,15 @@ import { HiPlus } from 'react-icons/hi';
 import Layout from '../components/MainLayout';
 import Navbar from '../components/Navbar';
 import FeedItem from '../components/feed/FeedItem';
+
+import MainLayout from '../components/MainLayout';
+import useUserDetail from '../hooks/useUserDetail';
+import noProfpic from '../media/no-profpic.png';
+import noUserBg from '../media/no-background.jpg';
 import { countString } from '../utils/numberToString';
 import userDetailDummy from '../misc/dummyUser';
 import dummyFeeds from '../misc/dummyFeeds';
 import styles from '../styles/User.module.css';
-import MainLayout from '../components/MainLayout';
 
 // TODO: Style EmptyPage as placeholder while waiting for data
 const EmptyPage = () => {
@@ -26,18 +30,16 @@ const followButtonHandler = (id) => {
 
 const User = () => {
   const userId = useParams().id;
-  const [userDetail, setUserDetail] = useState(null);
+  const [userDetail, _] = useUserDetail(userId);
 
-  useEffect(() => {
-    // TODO: Request GraphQL API to get user details. DELETE CURRENT CODE
-    setUserDetail(userDetailDummy);
-    // TODO: Something like:
-    // useQuery(GET_USER_DETAIL){
-    //    $id: userId
-    // }
-  }, [userDetail]);
+  const profpic =
+    userDetail && userDetail.profilePictureUrl
+      ? userDetail.profilePictureUrl
+      : noProfpic;
+  const bg =
+    userDetail && userDetail.bgPictureUrl ? userDetail.bgPictureUrl : noUserBg;
 
-  return (
+  return userDetail ? (
     <MainLayout>
       <div className={styles.page}>
         {userDetail == null ? (
@@ -46,15 +48,12 @@ const User = () => {
           <div className={styles.container}>
             <div className={styles.header}>
               <div className={styles.headerImgContainer}>
-                <img
-                  src={userDetail.headerImageUrl}
-                  className={styles.headerImg}
-                />
+                <img src={bg} className={styles.headerImg} />
               </div>
               <div className={styles.userContainer}>
                 <div className={styles.profilePictureContainer}>
                   <img
-                    src={userDetail.profilePictureUrl}
+                    src={profpic}
                     className={styles.profilePicture}
                     alt={userDetail.fullname}
                   />
@@ -117,15 +116,15 @@ const User = () => {
             </div>
             <div className={styles.feedContainer}>
               {/* TODO: Change this to posts by the user */}
-              {dummyFeeds.map((feed) => (
-                <FeedItem feed={feed} />
+              {dummyFeeds.map((feed, i) => (
+                <FeedItem key={i} feed={feed} />
               ))}
             </div>
           </div>
         )}
       </div>
     </MainLayout>
-  );
+  ) : null;
 };
 
 export default User;

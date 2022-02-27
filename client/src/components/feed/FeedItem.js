@@ -18,7 +18,7 @@ const userDetail = {
 };
 // =====
 
-const FeedItem = ({ feed }) => {
+const FeedItem = ({ feed, alwaysOpen }) => {
   // TODO: GET user data from GraphQL API
   const [isLiked, setIsLiked] = useState(false);
   const [commentsCount, setCommentsCount] = useState(feed.comments.length);
@@ -124,7 +124,9 @@ const FeedItem = ({ feed }) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setOpenComments(!openComments);
+                if (!alwaysOpen) {
+                  setOpenComments(!openComments);
+                }
               }}
             >
               <CommentIcon
