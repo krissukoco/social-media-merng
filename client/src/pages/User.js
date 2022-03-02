@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { MdLocationOn } from 'react-icons/md';
 import { BsGlobe2 } from 'react-icons/bs';
 import { HiPlus } from 'react-icons/hi';
+import { AiFillEdit } from 'react-icons/ai';
 
 import Layout from '../components/MainLayout';
 import Navbar from '../components/Navbar';
@@ -14,8 +15,10 @@ import noProfpic from '../media/no-profpic.png';
 import noUserBg from '../media/no-background.jpg';
 import { countString } from '../utils/numberToString';
 import userDetailDummy from '../misc/dummyUser';
+
 import dummyFeeds from '../misc/dummyFeeds';
 import styles from '../styles/User.module.css';
+import UserContext from '../context/UserContext';
 
 // TODO: Style EmptyPage as placeholder while waiting for data
 const EmptyPage = () => {
@@ -23,6 +26,8 @@ const EmptyPage = () => {
 };
 
 const followButtonHandler = (id) => {
+  // TODO: Make follow this user
+  // TODO: If unauthenticated, then redirect to login page
   console.log('HANDLE THIS BUTTON!!!');
   console.log('User id: ', id);
   return;
@@ -32,6 +37,8 @@ const User = () => {
   const userId = useParams().id;
   const [userDetail, _] = useUserDetail(userId);
 
+  const { userDetail: clientDetail, __ } = useContext(UserContext);
+
   const profpic =
     userDetail && userDetail.profilePictureUrl
       ? userDetail.profilePictureUrl
@@ -39,7 +46,32 @@ const User = () => {
   const bg =
     userDetail && userDetail.bgPictureUrl ? userDetail.bgPictureUrl : noUserBg;
 
-  return userDetail ? (
+  const FollowButton = ({ followId }) => {
+    return (
+      <button
+        className={styles.followButton}
+        onClick={() => followButtonHandler(followId)}
+      >
+        <HiPlus style={{ marginRight: '0.5rem' }} /> <p>Follow</p>
+      </button>
+    );
+  };
+
+  const EditProfileButton = () => {
+    return (
+      <button
+        className={styles.editProfileButton}
+        onClick={(e) => {
+          window.location.replace('/settings');
+        }}
+      >
+        <AiFillEdit style={{ marginRight: '0.5rem' }} />
+        <p>Edit Profile</p>
+      </button>
+    );
+  };
+
+  return userDetail && clientDetail ? (
     <MainLayout>
       <div className={styles.page}>
         {userDetail == null ? (
@@ -99,16 +131,14 @@ const User = () => {
                         </p>
                       </a>
                     </div>
-                    <div className={`${styles.flexRow} ${styles.rowCentered}`}>
+                    <div className={`${styles.rowCentered} ${styles.flexRow}`}>
                       {/* TODO: Make button only visible if not the user itself */}
                       {/* TODO: Make "Followed" button if already following this user (and are not themselves) */}
-                      <button
-                        className={styles.followButton}
-                        onClick={() => followButtonHandler(userDetail.id)}
-                      >
-                        <HiPlus style={{ marginRight: '0.5rem' }} />{' '}
-                        <p>Follow</p>
-                      </button>
+                      {clientDetail.id == userId ? (
+                        <EditProfileButton />
+                      ) : (
+                        <FollowButton followId={userId} />
+                      )}
                     </div>
                   </div>
                 </div>

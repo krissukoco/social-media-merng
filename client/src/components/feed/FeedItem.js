@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { FaRegComment as CommentIcon } from 'react-icons/fa';
 import { AiFillLike as LikeIcon } from 'react-icons/ai';
 
 import FeedImage from './FeedImage';
 import CommentSection from './CommentSection';
+import useUserDetail from '../../hooks/useUserDetail';
 import { timeString } from '../../utils/numberToString';
+
 import styles from '../../styles/Feed.module.css';
+import noProfpic from '../../media/no-profpic.png';
+import NewComment from './NewComment';
+import UserContext from '../../context/UserContext';
 
 // === ONLY FOR DEVELOPMENT. Later from GraphQL API
 const userDetail = {
@@ -20,10 +25,15 @@ const userDetail = {
 
 const FeedItem = ({ feed, alwaysOpen }) => {
   // TODO: GET user data from GraphQL API
+  const [userDetail, setUserDetail] = useUserDetail(feed.user);
   const [isLiked, setIsLiked] = useState(false);
-  const [commentsCount, setCommentsCount] = useState(feed.comments.length);
-  const [likesCount, setLikesCount] = useState(feed.likes.length);
+  const [commentsCount, setCommentsCount] = useState(0);
+  const [likesCount, setLikesCount] = useState(0);
   const [openComments, setOpenComments] = useState(false);
+
+  const { userDetail: clientDetail, _ } = useContext(UserContext);
+
+  console.log('userDetail: ', userDetail);
 
   const navigate = useNavigate();
 
@@ -39,6 +49,19 @@ const FeedItem = ({ feed, alwaysOpen }) => {
     // TODO: Sync with DB
   };
 
+  if (feed == undefined) {
+    return null;
+  }
+
+  let profpic = noProfpic;
+  if (userDetail && userDetail.profilePictureUrl != '') {
+    profpic = userDetail.profilePictureUrl;
+  }
+
+  if (!userDetail) {
+    return null;
+  }
+
   return (
     <div
       onClick={(e) => {
@@ -47,6 +70,7 @@ const FeedItem = ({ feed, alwaysOpen }) => {
         console.log(e);
         navigate(`/post/${feed.id}`);
       }}
+      style={{ marginBottom: '1rem' }}
     >
       <div
         className={styles.feedItemContainer}
@@ -57,7 +81,7 @@ const FeedItem = ({ feed, alwaysOpen }) => {
       >
         <a style={{ padding: '0 0rem' }} href={`/user/${userDetail.id}`}>
           <img
-            src={userDetail.profilePictureUrl}
+            src={profpic}
             alt={userDetail.fullname}
             style={{
               width: '55px',
@@ -69,15 +93,16 @@ const FeedItem = ({ feed, alwaysOpen }) => {
         </a>
 
         <div className={styles.itemDetails}>
-          <div className={styles.itemUser}>
-            <a
-              className='has-text-weight-bold mr-2'
-              href={`/user/${userDetail.id}`}
-            >
-              {userDetail.fullname}
-            </a>
+          <div
+            className={styles.itemUser}
+            onClick={(e) => {
+              e.stopPropagation();
+              window.location.replace(`/user/${userDetail.id}`);
+            }}
+          >
+            <p className={styles.itemUserFullname}>{userDetail.fullname}</p>
             <div>
-              <a className='has-text-info-dark'>@{userDetail.username}</a>
+              <p className={styles.itemUsername}>@{userDetail.username}</p>
             </div>
           </div>
           <div className='has-text-grey-light'>
@@ -85,7 +110,7 @@ const FeedItem = ({ feed, alwaysOpen }) => {
           </div>
           <div className={styles.feedBody}>
             <h5 style={{ paddingBottom: '1rem' }}>{feed.body}</h5>
-            {feed.imgUrls.length > 0 ? (
+            {feed != undefined && feed.imgUrls.length > 0 ? (
               <FeedImage imgUrls={feed.imgUrls} />
             ) : null}
           </div>
@@ -145,7 +170,9 @@ const FeedItem = ({ feed, alwaysOpen }) => {
               transition: 'all 0.5s',
               overflow: 'hidden',
             }}
+            onClick={(e) => e.stopPropagation()}
           >
+            {clientDetail ? <NewComment /> : null}
             <CommentSection comments={feed.comments} />
           </div>
         </div>

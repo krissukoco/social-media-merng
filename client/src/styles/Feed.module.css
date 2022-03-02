@@ -1,4 +1,11 @@
 /* Primary Blue Color: #38B6FF */
+:root {
+  --primary-blue-color: #38b6ff;
+  --darker-blue-color: #329cda;
+  --hover-blue-color: #2b8ec7;
+  --hover-blue-secondary: #8accf1;
+  --light-grey: rgb(163, 162, 162);
+}
 
 a {
   color: inherit;
@@ -38,6 +45,40 @@ a:hover {
   padding-top: 10px;
 }
 
+.feedTab {
+  display: flex;
+  flex-direction: row;
+  width: 70%;
+  margin: auto;
+  padding: 0.5rem 0;
+  color: grey;
+}
+
+.feedTab > a {
+  width: 50%;
+  justify-content: center;
+  text-align: center;
+}
+
+.feedTab > a:hover {
+  font-weight: bold;
+  transform: 0.3s;
+}
+
+.tabActive {
+  font-weight: bold;
+  color: var(--primary-blue-color);
+}
+
+.noPosts {
+  text-align: center;
+  color: grey;
+  font-style: italic;
+  font-size: 0.8rem;
+  padding: 1.5rem 0;
+  background-color: white;
+}
+
 /* FeedItem */
 .feedItemContainer {
   display: flex;
@@ -65,6 +106,20 @@ a:hover {
   flex-direction: row;
   width: 100%;
   margin: 0 auto;
+}
+
+.itemUser:hover {
+  cursor: pointer;
+}
+
+.itemUserFullname {
+  font-weight: bold;
+  color: black;
+  margin-right: 0.5rem;
+}
+
+.itemUsername {
+  color: var(--darker-blue-color);
 }
 
 .feedBody {

@@ -33,3 +33,51 @@ export const GET_SELF_DETAIL = gql`
     }
   }
 `;
+
+export const GET_FEED_LATEST = gql`
+  query getFeedLatest($limit: Int) {
+    getFeedLatest(limit: $limit) {
+      id
+      body
+      user
+      postType
+      imgUrls
+      createdAt
+      updatedAt
+      comments {
+        id
+        body
+        user
+        createdAt
+      }
+      likes {
+        user
+        createdAt
+      }
+    }
+  }
+`;
+
+export const GET_FEED_FOLLOWING = gql`
+  query getFeedFollowing($limit: Int) {
+    getFeedFollowing(limit: $limit) {
+      id
+      body
+      user
+      postType
+      imgUrls
+      createdAt
+      updatedAt
+      comments {
+        id
+        body
+        user
+        createdAt
+      }
+      likes {
+        user
+        createdAt
+      }
+    }
+  }
+`;

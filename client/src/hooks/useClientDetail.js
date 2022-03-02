@@ -19,7 +19,6 @@ const useClientDetail = (initialValue) => {
       console.log('useClientDetail error: ', err);
     },
     onCompleted: (data) => {
-      console.log('onCompleted userClientDetail: ', data);
       setUserDetail(data.getSelf);
     },
   });

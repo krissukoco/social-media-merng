@@ -75,9 +75,10 @@ const FeedImage = ({ imgUrls }) => {
       <img
         src={imgUrls[imgIndex]}
         style={{
-          width: '100%',
+          maxWidth: '100%',
           transition: 'opacity 0.6s ease-in-out',
           zIndex: 1,
+          justifyContent: 'center',
         }}
       />
       <SliderArrow type='previous' />

@@ -6,7 +6,8 @@ const {
   validateCreatePost,
   validateDeletePost,
 } = require('../../utils/validatePost');
-const validateToken = require('../../utils/validateToken');
+const { validateToken } = require('../../utils/validateToken');
+const { uploadImageS3 } = require('../../storage/imageHandlerS3');
 
 module.exports = {
   Query: {
@@ -26,14 +27,30 @@ module.exports = {
       }
     },
 
-    // Get posts from all "following"
-    async getFeedFollowing(_, { input }) {
+    // Get Posts by the Latest created_at
+    async getFeedLatest(_, { limit }) {
       let posts = [];
-      let limit = 10; // 10 is the default limit
-      const token = input.token; // TODO: Change to context
-      if (input.limit) {
-        limit = input.limit;
+      let lim = limit ? limit : 10;
+
+      let res = await Post.find().sort({ createdAt: -1 }).limit(lim);
+      for (let p of res) {
+        const { _id, __v, ...result } = p._doc;
+        posts.push({
+          ...result,
+          id: _id,
+        });
       }
+
+      console.log('1 Post from resolver: ', posts[0]);
+
+      return posts;
+    },
+
+    // Get posts from all "following"
+    async getFeedFollowing(_, { limit }, { req }) {
+      let posts = [];
+      let lim = limit ? limit : 10; // 10 is the default limit
+      const token = req.headers.authorization;
 
       // TODO: Validate the token and give back the decoded data
       const { valid, decoded, errors } = validateToken(token);
@@ -53,10 +70,11 @@ module.exports = {
       }
       for (let i in followingId) {
         let res = await Post.find({ user: followingId[i] }); // array of posts
-        for (let p in res) {
+        for (let p of res) {
+          const { _id, __v, ...result } = p._doc;
           posts.push({
-            ...res[p]._doc,
-            id: res[p]._id,
+            ...result,
+            id: _id,
           });
         }
       }
@@ -76,11 +94,16 @@ module.exports = {
   },
   Mutation: {
     // Create a post
-    async createPost(_, { input }) {
+    async createPost(_, { input }, { req }) {
+      const token = req.headers.authorization;
+      console.log('createPost input: ', input);
+
       let newPost;
-      // TODO: Validate the inputs
-      const { valid, errors, validatedInput, userId } =
-        validateCreatePost(input);
+      const { valid, errors, validatedInput, userId } = validateCreatePost(
+        input,
+        token
+      );
+      console.log('createPost validatedInput: ', validatedInput);
       console.log('Data after validation: ', {
         valid,
         errors,
@@ -88,19 +111,32 @@ module.exports = {
         userId,
       });
       if (!valid) {
-        for (e in errors) {
+        errors.forEach((e) => {
           throw new UserInputError(e);
-        }
+        });
       }
 
-      // TODO: Create new post
+      // TODO: Upload images to S3, if there's any
+      let s3ImgUrls = [];
+      if (validatedInput.images.length > 0) {
+        const { success, images: uploadRes } = await uploadImageS3(
+          validatedInput.images
+        );
+        if (!success) {
+          throw new Error('Failed to upload images');
+        }
+        console.log('uploadRes: ', uploadRes);
+        s3ImgUrls = uploadRes.map((img) => img.url);
+        console.log('s3ImgUrls from post mutation: ', s3ImgUrls);
+      }
+
       // Differentiate between polls and other types
       if (validatedInput.postType == 'poll') {
         newPost = new Post({
           body: validatedInput.body,
           user: userId,
           postType: validatedInput.postType,
-          imgUrls: validatedInput.imgUrls,
+          imgUrls: s3ImgUrls,
           poll: validatedInput.poll,
           comments: [],
           likes: [],
@@ -112,7 +148,7 @@ module.exports = {
           body: validatedInput.body,
           user: userId,
           postType: validatedInput.postType,
-          imgUrls: validatedInput.imgUrls,
+          imgUrls: s3ImgUrls,
           comments: [],
           likes: [],
           createdAt: new Date().toISOString(),

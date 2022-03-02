@@ -1,0 +1,25 @@
+.errorCard {
+  background-color: red;
+  color: white;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
+
+.errorList {
+  list-style: square;
+  padding: 0 1rem;
+  text-align: left;
+}
+
+.successCard {
+  position: absolute;
+  justify-content: center;
+  margin: auto;
+  padding: 0.5rem 1rem;
+  background-color: lightblue;
+  text-align: center;
+  font-size: 0.9rem;
+  color: white;
+}

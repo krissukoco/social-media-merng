@@ -2,6 +2,8 @@ const { gql } = require('apollo-server');
 
 module.exports = gql`
   # Low-level types
+  scalar Upload
+
   type Vote {
     userId: ID!
     createdAt: String!
@@ -12,14 +14,13 @@ module.exports = gql`
     votes: [Vote]!
   }
   type Comment {
-    id: ID!
-    body: String!
-    user: ID!
-    createdAt: String!
-    updatedAt: String!
+    id: ID
+    body: String
+    user: ID
+    createdAt: String
   }
   type Like {
-    user: User!
+    user: ID!
     createdAt: String!
   }
   type Poll {
@@ -64,6 +65,12 @@ module.exports = gql`
     postId: ID!
     deletedAt: String!
   }
+  type ImageResponse {
+    uri: String!
+    filename: String!
+    mimetype: String!
+    encoding: String!
+  }
 
   # INPUTS
   input VoteInput {
@@ -93,28 +100,39 @@ module.exports = gql`
   input CreatePostInput {
     postType: String!
     body: String!
-    token: String!
-    imgUrls: [String]
+    images: [Upload]!
     poll: PollInput
   }
   input DeletePostInput {
     postId: ID!
     token: String!
   }
+  input ImageInput {
+    uri: String!
+    filename: String!
+    mimetype: String!
+    encoding: String!
+  }
 
   # Queries & Mutations
   type Query {
     getSelf: User
-    getUser(id: ID!): User!
+    getUser(id: ID!): User
     getPost(id: ID!): Post!
+    getImage(id: ID!): ImageResponse!
     getPostsByUser(userId: ID!, limit: Int!): [Post]!
-    getFeedFollowing(limit: Int, token: String!): [Post]!
+    getFeedFollowing(limit: Int): [Post]!
+    getFeedLatest(limit: Int): [Post]!
   }
 
   type Mutation {
     registerUser(input: RegisterInput): LoginRegisterResponse!
     loginUser(input: LoginInput): LoginRegisterResponse!
-    createPost(input: CreatePostInput): Post!
+    # updateUser(input: RegisterInput): LoginRegisterResponse!
+    createPost(input: CreatePostInput): Post
     deletePost(input: DeletePostInput): DeletedPostResponse!
+    createComment(text: String!): Comment
+    uploadProfilePicture(input: Upload!): ImageResponse
+    uploadCoverPicture(input: Upload!): ImageResponse
   }
 `;

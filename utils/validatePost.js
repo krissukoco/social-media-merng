@@ -2,14 +2,14 @@ const postTypes = require('../misc/postTypes');
 const jwt = require('jsonwebtoken');
 
 const { SECRET_KEY } = require('../config');
-const validateToken = require('./validateToken');
+const { validateToken } = require('./validateToken');
 
-module.exports.validateCreatePost = (input) => {
+// CREATE POST
+module.exports.validateCreatePost = (input, token) => {
   let userId;
   let poll;
-  let imgUrls;
+  let images = input.images;
   let errors = [];
-  let token = input.token;
   // TODO: NOT EMPTY: postType, body, token
   if (input.postType.length === 0) {
     errors.push('postType should not be empty');
@@ -17,7 +17,7 @@ module.exports.validateCreatePost = (input) => {
   if (input.body.length === 0) {
     errors.push('post body should not be empty');
   }
-  if (input.token.length === 0) {
+  if (token.length === 0) {
     errors.push('token should not be empty');
   }
 
@@ -34,13 +34,13 @@ module.exports.validateCreatePost = (input) => {
     console.log('userId from token: ', userId);
   }
 
-  // TODO: If postType === "image", then imgUrls should not be empty
+  // TODO: If postType === "image", then images should not be empty
   if (input.postType == 'image') {
-    if (!input.imgUrls || input.imgUrls == 0) {
-      errors.push('imgUrls should not be empty');
+    if (!input.images || input.images == 0) {
+      errors.push('images should not be empty');
     }
   } else {
-    imgUrls = [];
+    images = [];
   }
 
   // TODO: If postType === "poll", then poll should not be empty
@@ -48,11 +48,6 @@ module.exports.validateCreatePost = (input) => {
     if (!input.poll || input.poll.choices.length == 0) {
       errors.push('Poll object is not present or incorrect');
     }
-  } else {
-    poll = {
-      caption: '',
-      choices: [],
-    };
   }
 
   // TODO: Set validatedData
@@ -60,7 +55,7 @@ module.exports.validateCreatePost = (input) => {
     postType: input.postType,
     body: input.body,
     token: token,
-    imgUrls,
+    images,
     poll,
   };
 
@@ -68,6 +63,7 @@ module.exports.validateCreatePost = (input) => {
   return { valid, errors, validatedInput, userId };
 };
 
+// DELETE POST
 module.exports.validateDeletePost = (token, userId) => {
   let errors = [];
 
@@ -97,3 +93,5 @@ module.exports.validateDeletePost = (token, userId) => {
     errors,
   };
 };
+
+// TODO: UPDATE POST (optional)

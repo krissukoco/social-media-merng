@@ -6,6 +6,8 @@ import ReactHrmlParser from 'react-html-parser';
 import Footer from '../components/Footer';
 import LoginInput from '../components/loginRegister/LoginInput';
 import SignupInput from '../components/loginRegister/SignupInput';
+import ErrorCard from '../components/utils/ErrorCard';
+
 import { LOGIN_USER, REGISTER_USER } from '../graphql/mutations';
 import {
   getLocalData,
@@ -18,18 +20,6 @@ import logo from '../media/logo-horizontal.png';
 
 import texts from '../misc/copywritingLogin';
 import spinnerBlue from '../media/loading-spinner-blue.gif';
-
-const ErrorCard = ({ errors }) => {
-  return (
-    <div className={styles.errorCard}>
-      <ul className={styles.errorList}>
-        {errors.map((e, i) => (
-          <li key={i}>{e}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
 
 const LoginRegister = ({ page }) => {
   const getTexts = (type) => {

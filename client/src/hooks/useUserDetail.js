@@ -21,7 +21,6 @@ const useUserDetail = (userId) => {
       console.log('useUsertDetail error: ', err);
     },
     onCompleted: (data) => {
-      console.log('onCompleted userUserDetail: ', data);
       setUserDetail(data.getUser);
     },
   });

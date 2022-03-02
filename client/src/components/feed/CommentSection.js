@@ -57,14 +57,17 @@ const CommentItem = ({ comment }) => {
 };
 
 const CommentSection = ({ comments }) => {
+  if (!comments || comments.length == 0) {
+    return null;
+  }
   return (
     <div className={styles.commentSection}>
       <h3 style={{ fontSize: '0.9rem', color: 'grey' }}>
         Showing {countString(comments.length)} comments
       </h3>
-      {comments.map((comment, i) => (
-        <CommentItem key={i} comment={comment} />
-      ))}
+      {comments &&
+        comments.length > 0 &&
+        comments.map((comment, i) => <CommentItem key={i} comment={comment} />)}
     </div>
   );
 };

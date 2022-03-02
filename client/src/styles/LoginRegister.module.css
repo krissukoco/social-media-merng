@@ -101,18 +101,3 @@
   color: white;
   transition: 0.3s ease-in-out;
 }
-
-.errorCard {
-  background-color: red;
-  color: white;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  border-radius: 5px;
-  font-size: 0.8rem;
-}
-
-.errorList {
-  list-style: square;
-  padding: 0 1rem;
-  text-align: left;
-}
