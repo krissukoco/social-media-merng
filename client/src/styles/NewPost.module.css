@@ -39,7 +39,7 @@
 }
 
 .postBody:focus {
-  min-height: 6rem;
+  min-height: 4rem;
   transition: all 0.3s ease-in-out;
 }
 

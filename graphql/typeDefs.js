@@ -66,7 +66,7 @@ module.exports = gql`
     deletedAt: String!
   }
   type ImageResponse {
-    uri: String!
+    url: String!
     filename: String!
     mimetype: String!
     encoding: String!
@@ -96,6 +96,13 @@ module.exports = gql`
   input LoginInput {
     emailOrUsername: String!
     password: String!
+  }
+  input UpdateUserInput {
+    username: String!
+    fullname: String!
+    email: String!
+    bio: String!
+    location: String!
   }
   input CreatePostInput {
     postType: String!
@@ -128,11 +135,19 @@ module.exports = gql`
   type Mutation {
     registerUser(input: RegisterInput): LoginRegisterResponse!
     loginUser(input: LoginInput): LoginRegisterResponse!
-    # updateUser(input: RegisterInput): LoginRegisterResponse!
-    createPost(input: CreatePostInput): Post
-    deletePost(input: DeletePostInput): DeletedPostResponse!
-    createComment(text: String!): Comment
-    uploadProfilePicture(input: Upload!): ImageResponse
-    uploadCoverPicture(input: Upload!): ImageResponse
+    updateUser(input: UpdateUserInput!): User!
+    followUser(id: ID!): User! #Client's own detail
+    unfollowUser(id: ID!): User!
+    changePassword(
+      oldPassword: String!
+      newPassword: String!
+      confirmPassword: String!
+    ): User
+    uploadPersonalPicture(image: Upload!, type: String!): User
+    createPost(input: CreatePostInput!): Post
+    deletePost(input: DeletePostInput!): DeletedPostResponse!
+    createComment(postId: ID!, text: String!): Post
+    likePost(postId: ID!): Post
+    unlikePost(postId: ID!): Post
   }
 `;

@@ -13,9 +13,7 @@ const useFeed = (limit) => {
   const [followingPosts, setFollowingPosts] = useState([]);
   const [token, setToken] = useState();
 
-  console.log('activeTab: ', activeTab);
-  console.log('latestPost state: ', latestPosts);
-  console.log('followingPosts state: ', followingPosts);
+  let loading = true;
 
   useEffect(() => {
     const { _, token: localToken } = getLocalData();
@@ -34,6 +32,7 @@ const useFeed = (limit) => {
         authorization: token,
       },
     },
+    fetchPolicy: 'no-cache',
     onError: (error) => console.log(error),
     onCompleted: (data) => {
       if (data != undefined) {
@@ -53,6 +52,7 @@ const useFeed = (limit) => {
         authorization: token,
       },
     },
+    fetchPolicy: 'no-cache',
     onError: (error) => console.log(error),
     onCompleted: (data) => {
       if (data != undefined) {
@@ -74,9 +74,20 @@ const useFeed = (limit) => {
       console.log('GO DEFAULT');
       setPosts([...latestPosts]);
     }
+
+    if (folLoading || latestLoading) {
+      loading = true;
+    } else {
+      loading = false;
+    }
   }, [activeTab, latestPosts, followingPosts]);
 
-  return [posts, activeTab, setActiveTab];
+  return {
+    posts,
+    loading: folLoading || latestLoading,
+    activeTab,
+    setActiveTab,
+  };
 };
 
 export default useFeed;

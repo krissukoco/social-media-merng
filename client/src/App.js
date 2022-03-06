@@ -17,6 +17,7 @@ import Post from './pages/Post';
 import User from './pages/User';
 import Login from './pages/LoginRegister';
 import Settings from './pages/Settings';
+import NotFound from './pages/NotFound';
 import useClientDetail from './hooks/useClientDetail';
 
 function App() {
@@ -30,15 +31,21 @@ function App() {
     <UserContext.Provider value={{ userDetail, setUserDetail }}>
       <Router>
         <Routes>
-          <Route index element={userDetail != null ? <Feed /> : <Home />} />
+          <Route
+            index
+            element={userDetail !== null ? <Navigate to='/feed' /> : <Home />}
+          />
           <Route path='/feed' element={<Feed />} />
-          <Route path='/post' element={<Post />} />
-          <Route path='/user' element={<User />}>
-            <Route path=':id' element={<User />} />
-          </Route>
+          <Route path='/post/:id' element={<Post />} />
+          <Route path='/user/:id' element={<User />} />
           <Route path='/login' element={<Login page='login' />} />
           <Route path='/signup' element={<Login page='signup' />} />
-          <Route path='/settings' element={<Settings />} />
+          <Route
+            path='/settings'
+            element={userDetail !== null ? <Settings /> : <Navigate to='/' />}
+          />
+          <Route path='/404' element={<NotFound />} />
+          <Route path='*' element={<Navigate to='/404' />} />
         </Routes>
       </Router>
     </UserContext.Provider>

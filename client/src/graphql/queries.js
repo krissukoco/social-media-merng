@@ -81,3 +81,27 @@ export const GET_FEED_FOLLOWING = gql`
     }
   }
 `;
+
+export const GET_POSTS_BY_USER = gql`
+  query getPostsByUser($userId: ID!, $limit: Int!) {
+    getPostsByUser(userId: $userId, limit: $limit) {
+      id
+      body
+      user
+      postType
+      imgUrls
+      createdAt
+      updatedAt
+      comments {
+        id
+        body
+        user
+        createdAt
+      }
+      likes {
+        user
+        createdAt
+      }
+    }
+  }
+`;

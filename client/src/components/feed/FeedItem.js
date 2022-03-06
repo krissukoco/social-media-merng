@@ -1,5 +1,6 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useMutation } from '@apollo/client';
 import { FaRegComment as CommentIcon } from 'react-icons/fa';
 import { AiFillLike as LikeIcon } from 'react-icons/ai';
 
@@ -8,57 +9,91 @@ import CommentSection from './CommentSection';
 import useUserDetail from '../../hooks/useUserDetail';
 import { timeString } from '../../utils/numberToString';
 
-import styles from '../../styles/Feed.module.css';
-import noProfpic from '../../media/no-profpic.png';
+import { LIKE_POST, UNLIKE_POST } from '../../graphql/mutations';
 import NewComment from './NewComment';
 import UserContext from '../../context/UserContext';
+import { getLocalData } from '../../utils/handleUserAuth';
+import { countString } from '../../utils/numberToString';
 
-// === ONLY FOR DEVELOPMENT. Later from GraphQL API
-const userDetail = {
-  id: '12345',
-  username: 'kylianmbappe',
-  fullname: 'Kylian Mbappe',
-  profilePictureUrl:
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/2019-07-17_SG_Dynamo_Dresden_vs._Paris_Saint-Germain_by_Sandro_Halank%E2%80%93129_%28cropped%29.jpg/800px-2019-07-17_SG_Dynamo_Dresden_vs._Paris_Saint-Germain_by_Sandro_Halank%E2%80%93129_%28cropped%29.jpg',
-};
-// =====
+import styles from '../../styles/Feed.module.css';
+import noProfpic from '../../media/no-profpic.png';
 
 const FeedItem = ({ feed, alwaysOpen }) => {
   // TODO: GET user data from GraphQL API
-  const [userDetail, setUserDetail] = useUserDetail(feed.user);
+  const [userDetail, __] = useUserDetail(feed.user);
+  const [token, setToken] = useState();
   const [isLiked, setIsLiked] = useState(false);
-  const [commentsCount, setCommentsCount] = useState(0);
+  const [feedData, setFeedData] = useState(feed);
   const [likesCount, setLikesCount] = useState(0);
   const [openComments, setOpenComments] = useState(false);
 
   const { userDetail: clientDetail, _ } = useContext(UserContext);
 
-  console.log('userDetail: ', userDetail);
+  console.log('userDetail on FeedItem: ', userDetail);
 
   const navigate = useNavigate();
 
-  const likeHandler = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsLiked(!isLiked);
-    if (!isLiked) {
-      setLikesCount(likesCount + 1);
-    } else {
-      setLikesCount(likesCount - 1);
+  useEffect(() => {
+    const { token: t } = getLocalData();
+    setToken(t);
+    if (feedData) {
+      let numLikes = feedData.likes.length;
+      setLikesCount(numLikes);
+      if (clientDetail && feedData) {
+        let usersLiked = feedData.likes.map((like) => like.user);
+        let liked = usersLiked.includes(clientDetail.id);
+        setIsLiked(liked);
+      }
     }
-    // TODO: Sync with DB
-  };
-
-  if (feed == undefined) {
-    return null;
-  }
+  }, [feedData]);
 
   let profpic = noProfpic;
   if (userDetail && userDetail.profilePictureUrl != '') {
     profpic = userDetail.profilePictureUrl;
   }
 
-  if (!userDetail) {
+  // --- Like post
+  const [likePost, { data: likeData, loading, error: likeError }] =
+    useMutation(LIKE_POST);
+
+  useEffect(() => {
+    if (likeData) {
+      setFeedData(likeData.likePost);
+    }
+  }, [likeData]);
+
+  // --- Unlike post
+  const [
+    unlikePost,
+    { data: unlikeData, loading: unlikedLoading, error: unlikeError },
+  ] = useMutation(UNLIKE_POST);
+  useEffect(() => {
+    if (unlikeData) {
+      setFeedData(unlikeData.unlikePost);
+    }
+  }, [unlikeData]);
+
+  const likeHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // TODO: Sync with DB
+    if (token) {
+      const config = {
+        variables: { postId: feedData.id },
+        context: {
+          headers: { authorization: token },
+        },
+        fetchPolicy: 'no-cache',
+      };
+      if (!isLiked) {
+        likePost(config);
+      } else if (isLiked) {
+        unlikePost(config);
+      }
+    }
+  };
+
+  if (!userDetail || !feedData) {
     return null;
   }
 
@@ -68,7 +103,7 @@ const FeedItem = ({ feed, alwaysOpen }) => {
         e.stopPropagation();
         e.bubbles = false;
         console.log(e);
-        navigate(`/post/${feed.id}`);
+        navigate(`/post/${feedData.id}`);
       }}
       style={{ marginBottom: '1rem' }}
     >
@@ -106,12 +141,12 @@ const FeedItem = ({ feed, alwaysOpen }) => {
             </div>
           </div>
           <div className='has-text-grey-light'>
-            {timeString(new Date(feed.createdAt))}
+            {timeString(new Date(feedData.createdAt))}
           </div>
           <div className={styles.feedBody}>
-            <h5 style={{ paddingBottom: '1rem' }}>{feed.body}</h5>
-            {feed != undefined && feed.imgUrls.length > 0 ? (
-              <FeedImage imgUrls={feed.imgUrls} />
+            <h5 style={{ paddingBottom: '1rem' }}>{feedData.body}</h5>
+            {feedData && feedData.imgUrls.length > 0 ? (
+              <FeedImage imgUrls={feedData.imgUrls} />
             ) : null}
           </div>
 
@@ -137,7 +172,7 @@ const FeedItem = ({ feed, alwaysOpen }) => {
                 }}
               />
               <h6 style={{ fontSize: '1rem', transition: '0.3s' }}>
-                {likesCount}
+                {countString(likesCount)}
               </h6>
             </a>
             <a
@@ -158,7 +193,7 @@ const FeedItem = ({ feed, alwaysOpen }) => {
                 style={{ width: '20px', height: '20px', margin: '0 5px' }}
               />
 
-              <h6 style={{ fontSize: '1rem' }}>{feed.comments.length}</h6>
+              <h6 style={{ fontSize: '1rem' }}>{feedData.comments.length}</h6>
             </a>
           </div>
 
@@ -172,8 +207,14 @@ const FeedItem = ({ feed, alwaysOpen }) => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {clientDetail ? <NewComment /> : null}
-            <CommentSection comments={feed.comments} />
+            {clientDetail ? (
+              <NewComment
+                feed={feedData}
+                client={clientDetail}
+                setFeed={setFeedData}
+              />
+            ) : null}
+            <CommentSection comments={feedData.comments} />
           </div>
         </div>
       </div>

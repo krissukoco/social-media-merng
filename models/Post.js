@@ -39,11 +39,6 @@ const postSchema = new mongoose.Schema({
         required: true,
         default: () => new Date().toISOString(),
       },
-      updatedAt: {
-        type: String,
-        required: true,
-        default: () => new Date().toISOString(),
-      },
     },
   ],
   likes: [

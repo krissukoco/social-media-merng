@@ -31,7 +31,6 @@ module.exports.validateCreatePost = (input, token) => {
   } else {
     const decodedData = tokenValidation.decoded;
     userId = decodedData.id;
-    console.log('userId from token: ', userId);
   }
 
   // TODO: If postType === "image", then images should not be empty

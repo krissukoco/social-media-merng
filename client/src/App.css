@@ -1,9 +1,16 @@
 :root {
   --primary-blue-color: #38b6ff;
+  --primary-blue-superlight: #bbe2f17c;
   --darker-blue-color: #329cda;
   --hover-blue-color: #2b8ec7;
   --hover-blue-secondary: #8accf1;
   --light-grey: rgb(163, 162, 162);
+  --primary-green-color: #2ade2a;
+  --darker-green-color: #116e11;
+}
+
+* {
+  font-family: 'Roboto', sans-serif;
 }
 
 a:hover {

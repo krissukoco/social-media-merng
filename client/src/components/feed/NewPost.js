@@ -14,20 +14,18 @@ import styles from '../../styles/NewPost.module.css';
 const NewPost = ({ userDetail }) => {
   const [text, setText] = useState('');
   const [token, setToken] = useState();
-  const [errors, setErrors] = useState([]);
+  const [error, setError] = useState();
   const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const [postResponse, setPostResponse] = useState();
   const [images, setImages] = useState([]);
-  const [imgFiles, setImgFiles] = useState();
-  const [preview, setPreview] = useState(false);
   const [poll, setPoll] = useState();
 
   useEffect(() => {
     const { _, token: t } = getLocalData();
     setToken(t);
   }, []);
+
+  console.log('SUCCESS POSTING: ', success);
 
   const getPostType = () => {
     let postType = 'standard';
@@ -49,7 +47,6 @@ const NewPost = ({ userDetail }) => {
     // FileList of images selected
     const files = e.target.files;
     if (files) {
-      setImgFiles(files);
       for (let i = 0; i < files.length; i++) {
         imgArr.push(files[i]);
       }
@@ -58,43 +55,40 @@ const NewPost = ({ userDetail }) => {
   };
 
   // Posting related
-  const [createPost, { data, loading, error }] = useMutation(CREATE_POST, {
-    onCompleted: (data) => {
-      if (data != undefined && data.createPost != postResponse) {
-        setText('');
-        setImages([]);
-        setErrors([]);
-        setIsLoading(false);
+  const [createPost, { data, loading, error: err }] = useMutation(CREATE_POST);
 
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
-        setPostResponse(data.createPost);
-      }
-    },
-    onError: (error) => {
-      setErrors([error]);
-    },
-  });
-  console.log('Data: ', data);
+  const onDataReturned = (data) => {
+    if (data) {
+      console.log(data);
+      setError();
+      setText('');
+      setImages([]);
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 5000);
+    }
+  };
 
-  console.log('postResponse: ', postResponse);
+  useEffect(() => {
+    onDataReturned(data);
+  }, [data]);
 
-  const successText = 'Successfully posting!';
-  console.log('Loading: ', loading);
+  if (err) console.log(err);
 
-  // TODO: Show user input errors & server error as error card
-  if (error) console.log('ERROR: ', error);
+  const successText = 'Success posting!';
 
   const onPostSubmit = (e) => {
     e.preventDefault();
     const postType = getPostType();
+    setError();
 
     createPost({
       variables: {
         input: {
           postType,
           body: text,
-          images: imgFiles,
+          images: images,
         },
       },
       context: {
@@ -102,19 +96,19 @@ const NewPost = ({ userDetail }) => {
           Authorization: token,
         },
       },
+      fetchPolicy: 'no-cache',
     });
-
-    setIsLoading(true);
   };
 
   let profpic = userDetail.profilePictureUrl || noProfpic;
 
   return (
     <div className={styles.container}>
-      {success ? <SuccessCard text={successText} /> : null}
-      {isLoading ? <LoadingFull /> : null}
+      {error ? <ErrorCard error={error} /> : null}
       <img src={profpic} className={styles.profilePicture} />
-      <div className={styles.postInput}>
+      <div className={styles.postInput} style={{ position: 'relative' }}>
+        {loading ? <LoadingFull /> : null}
+        {success ? <SuccessCard text={successText} /> : null}
         <textarea
           className={styles.postBody}
           rows='1'
@@ -124,6 +118,7 @@ const NewPost = ({ userDetail }) => {
           onChange={onTextChange}
           value={text}
         />
+
         {images && images.length > 0 ? (
           <div className={styles.previewImgContainer}>
             <button

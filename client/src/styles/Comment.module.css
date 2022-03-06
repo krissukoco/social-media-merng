@@ -1,3 +1,8 @@
+:root {
+  --primary-blue: #38b6ff;
+  --primary-blue-light: #a7defd;
+}
+
 .commentSection {
   padding: 1rem 0;
 }
@@ -22,4 +27,70 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* NewComment */
+.newCommentProfPic {
+  width: 40px;
+  height: 40px;
+  margin-right: 1rem;
+  border-radius: 50%;
+}
+
+.newCommentTextArea {
+  font-size: 0.9rem;
+  min-width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  min-height: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.newComment {
+  display: flex;
+  flex-direction: row;
+  min-height: 3rem;
+  width: 90%;
+  margin: 1rem auto 0 auto;
+  padding: 1rem 1.5rem;
+  background-color: white;
+  border: 0.5px solid lightgrey;
+  border-radius: 10px;
+  /* background-color: rgba(253, 246, 229, 0.897); */
+}
+
+.newCommentContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.newCommentButton {
+  cursor: pointer;
+  background-color: white;
+  border-radius: 10px;
+  border: 0.5px solid grey;
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.5rem;
+  height: 2.2rem;
+  width: 5rem;
+}
+
+/* COMMENT ITEM */
+.commentBody {
+  font-size: 0.9rem;
+  padding-top: 0.5rem;
+}
+
+.commentItemFullname {
+  font-size: 0.9rem;
+  padding-right: 0.5rem;
+  font-weight: bold;
+}
+
+.commentItemUsername {
+  font-size: 0.9rem;
+  color: var(--primary-blue);
 }

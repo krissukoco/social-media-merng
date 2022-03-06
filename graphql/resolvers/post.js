@@ -1,4 +1,4 @@
-const { UserInputError } = require('apollo-server');
+const { UserInputError, ApolloError } = require('apollo-server');
 
 const User = require('../../models/User');
 const Post = require('../../models/Post');
@@ -6,6 +6,7 @@ const {
   validateCreatePost,
   validateDeletePost,
 } = require('../../utils/validatePost');
+const { validateComment } = require('../../utils/validateCommentLike');
 const { validateToken } = require('../../utils/validateToken');
 const { uploadImageS3 } = require('../../storage/imageHandlerS3');
 
@@ -84,19 +85,34 @@ module.exports = {
     // Get All posts created by a user
     async getPostsByUser(_, { userId, limit }) {
       try {
-        const posts = await Post.find({ user: userId }).limit(limit);
+        const p = await Post.find({ user: userId })
+          .limit(limit)
+          .sort({ createdAt: -1 });
+        const posts = Array.from(p);
         console.log(`Posts by userId ${userId}: ${posts}`);
-        return posts;
+
+        const res = posts.map((post) => {
+          const { _id, __v, ...rest } = post._doc;
+          const result = {
+            ...rest,
+            id: post._id,
+          };
+          return result;
+        });
+
+        console.log('getPostsByUser res: ', res);
+        return res;
       } catch (error) {
         throw new Error(error);
       }
     },
   },
+
+  // ======= MUTATION =======
   Mutation: {
     // Create a post
     async createPost(_, { input }, { req }) {
       const token = req.headers.authorization;
-      console.log('createPost input: ', input);
 
       let newPost;
       const { valid, errors, validatedInput, userId } = validateCreatePost(
@@ -123,7 +139,7 @@ module.exports = {
           validatedInput.images
         );
         if (!success) {
-          throw new Error('Failed to upload images');
+          throw new ApolloError('Failed to upload images');
         }
         console.log('uploadRes: ', uploadRes);
         s3ImgUrls = uploadRes.map((img) => img.url);
@@ -167,7 +183,142 @@ module.exports = {
       };
     },
 
-    // Delete a post
+    // CREATE COMMENT TO A POST
+    async createComment(_, { postId, text }, { req }) {
+      const token = req.headers.authorization;
+      console.log('CREATE COMMENT');
+      console.log('postId: ', postId);
+      console.log('text: ', text);
+
+      const { valid, errors, userId } = validateComment(text, token);
+      if (!valid) {
+        errors.forEach((e) => {
+          throw new UserInputError(e);
+        });
+      }
+
+      try {
+        const newComment = {
+          body: text,
+          user: userId,
+        };
+        const post = await Post.findById(postId);
+        post.comments.push(newComment);
+
+        const res = await post.save();
+
+        // Re-get the updated post, return to client
+        const newPost = await Post.findById(postId);
+        const { _id, __v, ...result } = newPost._doc;
+
+        const response = {
+          ...result,
+          id: newPost._id,
+        };
+        console.log('createItem response: ', response);
+        return response;
+      } catch (e) {
+        throw new Error('Cannot update the post: ', e.message);
+      }
+    },
+
+    // LIKE A POST
+    async likePost(_, { postId }, { req }) {
+      // TODO: Check token, get the client's ID
+      const token = req.headers.authorization;
+      const { valid, errors, decoded } = validateToken(token);
+      if (!valid) {
+        for (err of errors) {
+          throw new ApolloError(err);
+        }
+      }
+      // TODO: Get client data from DB
+      const clientId = decoded.id;
+      const client = await User.findById(clientId);
+      if (!client) {
+        throw new ApolloError('Please login to like');
+      }
+      //  TODO: Get post data from DB
+      const post = await Post.findById(postId);
+      if (!post) {
+        throw new UserInputError("Post requested doesn't exist");
+      }
+
+      // TODO: Check if user already likes
+      const usersLiked = post._doc.likes.map((like) => like.user);
+      if (usersLiked.includes(clientId)) {
+        throw new UserInputError('You already liked this post');
+      }
+      // TODO: If not, then add userId in likes
+      const newLike = {
+        user: clientId,
+      };
+      post.likes.push(newLike);
+
+      // TODO: Save and return new post
+      const newPost = await post.save();
+      if (!newPost) {
+        throw new ApolloError('SERVER ERROR');
+      }
+      const { _id, __v, ...rest } = newPost._doc;
+      const result = {
+        ...rest,
+        id: newPost._doc._id,
+      };
+      console.log('RESULT FROM LIKED A POST: ', result);
+      return result;
+    },
+
+    // UNLIKE A POST
+    async unlikePost(_, { postId }, { req }) {
+      // TODO: Check token, get the client's ID
+      const token = req.headers.authorization;
+      const { valid, errors, decoded } = validateToken(token);
+      if (!valid) {
+        for (err of errors) {
+          throw new ApolloError(err);
+        }
+      }
+      // TODO: Get client data from DB
+      const clientId = decoded.id;
+      console.log('ClientID: ', clientId);
+      const client = await User.findById(clientId);
+      if (!client) {
+        throw new ApolloError('Please login to like');
+      }
+      //  TODO: Get post data from DB
+      const post = await Post.findById(postId);
+      console.log('Post res from unlikePost: ', post);
+      if (!post) {
+        throw new UserInputError("Post requested doesn't exist");
+      }
+
+      // TODO: Check if user already not liked
+      const usersLiked = post.likes.map((like) => like.user.toString());
+      console.log('usersLiked: ', usersLiked);
+      if (!usersLiked.includes(clientId)) {
+        throw new UserInputError('You HAVE NOT actually liked this post');
+      }
+      // TODO: If yes, then remove userId in likes
+      post.likes = post.likes.filter(
+        (item) => item.user.str != client._doc._id.str
+      );
+
+      // TODO: Save and return new post
+      const newPost = await post.save();
+      if (!newPost) {
+        throw new ApolloError('SERVER ERROR');
+      }
+      const { _id, __v, ...rest } = newPost._doc;
+      const result = {
+        ...rest,
+        id: newPost._doc._id,
+      };
+      console.log('RESULT FROM UNLIKED A POST: ', result);
+      return result;
+    },
+
+    // DELETE A POST
     async deletePost(_, { input }) {
       const { postId, token } = input;
 

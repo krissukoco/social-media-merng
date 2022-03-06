@@ -79,6 +79,30 @@ a:hover {
   background-color: white;
 }
 
+.loadMoreButton {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+  text-align: center;
+  padding: 0.5rem 1.2rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  background-color: var(--primary-blue-color);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 20px;
+  min-width: 8rem;
+  transition: min-width 0.5s ease-in;
+}
+
+.loadMoreButton:hover {
+  background-color: var(--darker-blue-color);
+  transition: 0.2s ease-in-out;
+}
+
 /* FeedItem */
 .feedItemContainer {
   display: flex;

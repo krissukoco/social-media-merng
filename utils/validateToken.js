@@ -8,6 +8,11 @@ module.exports.validateToken = (token) => {
   let errors = [];
   const now = () => Date.now();
 
+  if (!token || token == 'undefined') {
+    errors.push('Must provide a JWT token');
+    return { valid, decoded, errors };
+  }
+
   if (token.length > 0) {
     console.log('Original token: ', token);
     token = token.replace('Bearer ', '');

@@ -1,8 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@apollo/client';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { MdLocationOn } from 'react-icons/md';
 import { BsGlobe2 } from 'react-icons/bs';
-import { HiPlus } from 'react-icons/hi';
+import { HiPlus, HiCheck } from 'react-icons/hi';
 import { AiFillEdit } from 'react-icons/ai';
 
 import Layout from '../components/MainLayout';
@@ -14,30 +15,83 @@ import useUserDetail from '../hooks/useUserDetail';
 import noProfpic from '../media/no-profpic.png';
 import noUserBg from '../media/no-background.jpg';
 import { countString } from '../utils/numberToString';
-import userDetailDummy from '../misc/dummyUser';
+import { GET_POSTS_BY_USER } from '../graphql/queries';
+import { FOLLOW_USER, UNFOLLOW_USER } from '../graphql/mutations';
 
-import dummyFeeds from '../misc/dummyFeeds';
 import styles from '../styles/User.module.css';
 import UserContext from '../context/UserContext';
+import { getLocalData } from '../utils/handleUserAuth';
+import LoadingButton from '../components/utils/LoadingButton';
+import LoadingFull from '../components/utils/LoadingFull';
+import LoadingSpinner from '../components/utils/LoadingSpinner';
 
 // TODO: Style EmptyPage as placeholder while waiting for data
 const EmptyPage = () => {
   return <div>EMPTY</div>;
 };
 
-const followButtonHandler = (id) => {
-  // TODO: Make follow this user
-  // TODO: If unauthenticated, then redirect to login page
-  console.log('HANDLE THIS BUTTON!!!');
-  console.log('User id: ', id);
-  return;
+const FollowButton = ({ handler }) => {
+  return (
+    <button className={styles.followButton} onClick={handler}>
+      <HiPlus style={{ marginRight: '0.5rem' }} /> <p>Follow</p>
+    </button>
+  );
+};
+
+const FollowedButton = ({ handler }) => {
+  return (
+    <button className={styles.followedButton} onClick={handler}>
+      <HiCheck style={{ marginRight: '0.5rem' }} />
+      <p>Followed</p>
+    </button>
+  );
+};
+
+const getQueryParams = (key) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(key);
 };
 
 const User = () => {
-  const userId = useParams().id;
-  const [userDetail, _] = useUserDetail(userId);
+  const l = getQueryParams('limit') ? getQueryParams('limit') : 10;
+  const [limit, setLimit] = useState(l);
 
-  const { userDetail: clientDetail, __ } = useContext(UserContext);
+  const userId = useParams().id;
+  const [userDetail, setUserDetail] = useUserDetail(userId);
+  const { userDetail: clientDetail, setUserDetail: setClientDetail } =
+    useContext(UserContext);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  const [numFollowings, setNumFollowings] = useState(0);
+  const [numFollowers, setNumFollowers] = useState(0);
+  const [posts, setPosts] = useState([]);
+  const [token, setToken] = useState();
+
+  console.log('clientDetail: ', clientDetail);
+
+  useEffect(() => {
+    const { _, token: t } = getLocalData();
+    setToken(t);
+  }, []);
+
+  useEffect(() => {
+    console.log('clientDetail in useEffect: '.clientDetail);
+    let clientFollowing = clientDetail && clientDetail.following;
+    console.log('clientFollowing: ', clientFollowing);
+
+    if (clientFollowing && clientFollowing.includes(userId)) {
+      setIsFollowing(true);
+    }
+  }, [clientDetail]);
+
+  useEffect(() => {
+    if (userDetail && userDetail.following !== undefined) {
+      setNumFollowings(userDetail.following.length);
+    }
+    if (userDetail && userDetail.followers !== undefined) {
+      setNumFollowers(userDetail.followers.length);
+    }
+  }, [userDetail]);
 
   const profpic =
     userDetail && userDetail.profilePictureUrl
@@ -45,17 +99,6 @@ const User = () => {
       : noProfpic;
   const bg =
     userDetail && userDetail.bgPictureUrl ? userDetail.bgPictureUrl : noUserBg;
-
-  const FollowButton = ({ followId }) => {
-    return (
-      <button
-        className={styles.followButton}
-        onClick={() => followButtonHandler(followId)}
-      >
-        <HiPlus style={{ marginRight: '0.5rem' }} /> <p>Follow</p>
-      </button>
-    );
-  };
 
   const EditProfileButton = () => {
     return (
@@ -70,6 +113,89 @@ const User = () => {
       </button>
     );
   };
+
+  // Related to Posts by User
+  const { data, loading, error } = useQuery(GET_POSTS_BY_USER, {
+    variables: {
+      userId: userId,
+      limit: limit,
+    },
+    context: {
+      authorization: token,
+    },
+    fetchPolicy: 'no-cache',
+  });
+
+  useEffect(() => {
+    if (data) {
+      setPosts(data.getPostsByUser);
+    }
+  }, [data]);
+
+  // ---- Follow User -----
+  const [
+    followUser,
+    { data: followData, loading: followLoading, error: followError },
+  ] = useMutation(FOLLOW_USER);
+
+  const onFollow = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // setIsFollowing(true);
+    followUser({
+      variables: { id: userId },
+      context: {
+        headers: { authorization: token },
+      },
+      fetchPolicy: 'no-cache',
+    });
+    setNumFollowers(numFollowers + 1);
+  };
+
+  useEffect(() => {
+    console.log('followData: ', followData);
+    if (followData) {
+      setClientDetail(followData.followUser);
+      setIsFollowing(true);
+      // window.location.reload();
+    }
+  }, [followData]);
+
+  // ---- Unfollow User -----
+  const [
+    unfollowUser,
+    { data: unfollowData, loading: unfollowLoading, error: unfollowError },
+  ] = useMutation(UNFOLLOW_USER);
+
+  const onUnfollow = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // setIsFollowing(false);
+    unfollowUser({
+      variables: { id: userId },
+      context: {
+        headers: { authorization: token },
+      },
+      fetchPolicy: 'no-cache',
+    });
+
+    if (numFollowers > 0) {
+      setNumFollowers(numFollowers - 1);
+    }
+  };
+
+  useEffect(() => {
+    console.log('unfollowData: ', unfollowData);
+    if (unfollowData) {
+      setClientDetail(unfollowData.unfollowUser);
+      setIsFollowing(false);
+      // window.location.reload();
+    }
+  }, [unfollowData]);
+
+  if (!userDetail) {
+    return null;
+  }
 
   return userDetail && clientDetail ? (
     <MainLayout>
@@ -121,23 +247,27 @@ const User = () => {
                       <a className={styles.followContainer}>
                         <h2 className={styles.followText}>Followings</h2>
                         <h2 className={styles.followNumText}>
-                          {countString(userDetail.following.length)}
+                          {countString(numFollowings)}
                         </h2>
                       </a>
                       <a className={styles.followContainer}>
                         <h2 className={styles.followText}>Followers</h2>
                         <p className={styles.followNumText}>
-                          {countString(userDetail.followers.length)}
+                          {countString(numFollowers)}
                         </p>
                       </a>
                     </div>
                     <div className={`${styles.rowCentered} ${styles.flexRow}`}>
                       {/* TODO: Make button only visible if not the user itself */}
                       {/* TODO: Make "Followed" button if already following this user (and are not themselves) */}
-                      {clientDetail.id == userId ? (
+                      {followLoading || unfollowLoading ? (
+                        <LoadingButton />
+                      ) : clientDetail.id == userId ? (
                         <EditProfileButton />
+                      ) : !clientDetail ? null : !isFollowing ? (
+                        <FollowButton handler={onFollow} />
                       ) : (
-                        <FollowButton followId={userId} />
+                        <FollowedButton handler={onUnfollow} />
                       )}
                     </div>
                   </div>
@@ -145,8 +275,8 @@ const User = () => {
               </div>
             </div>
             <div className={styles.feedContainer}>
-              {/* TODO: Change this to posts by the user */}
-              {dummyFeeds.map((feed, i) => (
+              {loading ? <LoadingFull /> : null}
+              {posts.map((feed, i) => (
                 <FeedItem key={i} feed={feed} />
               ))}
             </div>
