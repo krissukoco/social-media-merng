@@ -130,17 +130,6 @@ export const CREATE_POST = gql`
       body
       user
       postType
-    }
-  }
-`;
-
-export const CREATE_COMMENT = gql`
-  mutation createComment($postId: ID!, $text: String!) {
-    createComment(postId: $postId, text: $text) {
-      id
-      body
-      user
-      postType
       imgUrls
       createdAt
       updatedAt
@@ -153,17 +142,6 @@ export const CREATE_COMMENT = gql`
       likes {
         user
         createdAt
-      }
-      poll {
-        caption
-        choices {
-          body
-          seq
-          votes {
-            userId
-            createdAt
-          }
-        }
       }
     }
   }
@@ -189,6 +167,30 @@ export const LIKE_POST = gql`
         user
         createdAt
       }
+    }
+  }
+`;
+
+export const UNLIKE_POST = gql`
+  mutation unlikePost($postId: ID!) {
+    unlikePost(postId: $postId) {
+      id
+      body
+      user
+      postType
+      imgUrls
+      createdAt
+      updatedAt
+      comments {
+        id
+        body
+        user
+        createdAt
+      }
+      likes {
+        user
+        createdAt
+      }
       poll {
         caption
         choices {
@@ -204,9 +206,19 @@ export const LIKE_POST = gql`
   }
 `;
 
-export const UNLIKE_POST = gql`
-  mutation unlikePost($postId: ID!) {
-    unlikePost(postId: $postId) {
+export const DELETE_POST = gql`
+  mutation deletePost($id: ID!) {
+    deletePost(id: $id) {
+      success
+      postId
+      deletedAt
+    }
+  }
+`;
+
+export const CREATE_COMMENT = gql`
+  mutation createComment($postId: ID!, $text: String!) {
+    createComment(postId: $postId, text: $text) {
       id
       body
       user

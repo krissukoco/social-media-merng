@@ -6,7 +6,7 @@ import onLogout from '../../utils/onLogout';
 import styles from '../../styles/Navbar.module.css';
 import noProfpic from '../../media/no-profpic.png';
 
-const Option = ({ children, text, onClick, style }) => {
+const Option = ({ children, onClick, style }) => {
   return (
     <a className={styles.navbarIconOption} style={style} onClick={onClick}>
       {children}
@@ -46,7 +46,13 @@ const UserIcon = ({ userDetail }) => {
     <div
       onClick={() => setiIsOpen(!isOpen)}
       ref={ref}
-      style={{ cursor: 'pointer' }}
+      style={{
+        cursor: 'pointer',
+        margin: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignContent: 'center',
+      }}
     >
       <img
         src={profpic}
@@ -55,6 +61,7 @@ const UserIcon = ({ userDetail }) => {
           height: '45px',
           objectFit: 'cover',
           borderRadius: '50%',
+          alignContent: 'center',
         }}
       />
       {isOpen && <Dropdown userDetail={userDetail} />}

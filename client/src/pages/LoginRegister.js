@@ -31,7 +31,7 @@ const LoginRegister = ({ page }) => {
 
   const [pageType, setPageType] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState([]);
+  const [error, setError] = useState();
   const [text, setText] = useState(getTexts(pageType));
 
   // Initialize page
@@ -53,14 +53,14 @@ const LoginRegister = ({ page }) => {
   // When page change from Log In to Sign Up and vv
   useEffect(() => {
     setIsLoading(false);
-    setErrors([]);
+    setError();
     setText(getTexts(page));
-  }, [pageType]);
+  }, [pageType, text]);
 
-  function onAPIErrors(err) {
-    let newErrors = [];
-    err.graphQLErrors.map((e) => newErrors.push(e.message));
-    setErrors(newErrors);
+  function onAPIError(err) {
+    // let newErrors = [];
+    // err.graphQLErrors.map((e) => newErrors.push(e.message));
+    setError(err.graphQLErrors[0].message);
   }
 
   // If login/signup is success
@@ -79,7 +79,7 @@ const LoginRegister = ({ page }) => {
     update: (_, result) => {
       onSuccess(result.data.registerUser);
     },
-    onError: (error) => onAPIErrors(error),
+    onError: (error) => onAPIError(error),
   });
 
   const [loginUser, { loginData, loading: loginLoading, error: loginError }] =
@@ -89,13 +89,22 @@ const LoginRegister = ({ page }) => {
       },
       onError: (error) => {
         console.log(error.graphQLErrors);
-        onAPIErrors(error);
+        onAPIError(error);
       },
     });
 
+  // Handle loading on main button
+  useEffect(() => {
+    if (registerLoading || loginLoading) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [registerLoading, loginLoading]);
+
   console.log('GraphQL Register Data: ', registerData);
   console.log('GraphQL Login Data: ', loginData);
-  console.log('Errors', errors, 'length', errors.length);
+  console.log('Error', error);
 
   // TODO: Make mutation to GraphQL endpoint
   const onSubmit = (ev) => {
@@ -163,7 +172,7 @@ const LoginRegister = ({ page }) => {
             noValidate
           >
             {pageType == 'login' ? <LoginInput /> : <SignupInput />}
-            {errors.length > 0 ? <ErrorCard errors={errors} /> : null}
+            {error ? <ErrorCard error={error} /> : null}
             <button className={styles.mainButton} type='submit'>
               {isLoading ? (
                 <img src={spinnerBlue} width='20px' />

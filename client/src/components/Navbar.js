@@ -20,14 +20,12 @@ export default function Navbar({ userDetail }) {
     <>
       <div className={styles.navContainer}>
         <nav className={styles.navbar}>
-          <div className='navbar-brand'>
+          <div>
             <a href='/'>
-              <img src={logo} alt='sportify logo' width='210' />
+              <img src={logo} alt='sportify logo' width='180' />
             </a>
           </div>
           <div className={styles.navMenu}>
-            {/* <a className='navbar-item'>Feed</a>
-            <a className='navbar-item'>About</a> */}
             {userDetail != null ? (
               <UserIcon userDetail={userDetail} />
             ) : (
@@ -49,7 +47,7 @@ export default function Navbar({ userDetail }) {
           </div>
         </nav>
       </div>
-      <div style={{ minHeight: '5.7rem' }}></div>
+      <div style={{ minHeight: '4.5rem', color: 'transparent' }}></div>
     </>
   );
 }

@@ -10,11 +10,17 @@ const { validateComment } = require('../../utils/validateCommentLike');
 const { validateToken } = require('../../utils/validateToken');
 const { uploadImageS3 } = require('../../storage/imageHandlerS3');
 
+const { checkIdValid } = require('../../utils/validateId');
+
 module.exports = {
   Query: {
     async getPost(_, { id }) {
       try {
-        const post = await Post.findById(id);
+        const isValidId = checkIdValid(id);
+        if (!isValidId) {
+          throw new UserInputError('Post ID is invalid');
+        }
+        const post = await Post.findOne({ _id: id });
         if (!post) {
           throw new UserInputError('Post not found');
         }
@@ -24,7 +30,7 @@ module.exports = {
           id: post._id,
         };
       } catch (error) {
-        throw new Error(error);
+        throw new ApolloError(error);
       }
     },
 
@@ -62,6 +68,10 @@ module.exports = {
       }
 
       // TODO: Get the "following" array
+      const isValidUserId = checkIdValid(decoded.id);
+      if (!isValidUserId) {
+        throw new UserInputError('User is incorrect');
+      }
       const user = await User.findById(decoded.id);
       const followingId = user.following; // ID string
 
@@ -319,13 +329,14 @@ module.exports = {
     },
 
     // DELETE A POST
-    async deletePost(_, { input }) {
-      const { postId, token } = input;
+    async deletePost(_, { id: postId }, { req }) {
+      const token = req.headers.authorization;
+      let success = false;
 
       // TODO: Find the post by ID. If doesn't exist, throw error
       const post = await Post.findById(postId);
       if (!post) {
-        throw new UserInputError(`Post with ID ${postId} doesn't exist`);
+        throw new UserInputError(`Post doesn't exist`);
       }
       const postUserId = post.user.toString();
 
@@ -340,14 +351,18 @@ module.exports = {
       // TODO: Delete
       const doc = await post.remove();
       if (doc) {
-        console.log('Doc', doc);
+        console.log('Doc deleted', doc);
+        success = true;
       }
-      return {
+
+      const res = {
+        success,
         postId,
         deletedAt: new Date().toISOString(),
       };
-    },
 
-    // Update a post
+      console.log('POST DELETED: ', res);
+      return res;
+    },
   },
 };

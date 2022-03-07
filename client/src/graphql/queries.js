@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 
+// ----- USER -----
 export const GET_USER_DETAIL = gql`
   query getUser($id: ID!) {
     getUser(id: $id) {
@@ -30,6 +31,31 @@ export const GET_SELF_DETAIL = gql`
       followers
       profilePictureUrl
       bgPictureUrl
+    }
+  }
+`;
+
+// ----- POST -----
+export const GET_POST = gql`
+  query getPost($id: ID!) {
+    getPost(id: $id) {
+      id
+      body
+      user
+      postType
+      imgUrls
+      createdAt
+      updatedAt
+      comments {
+        id
+        body
+        user
+        createdAt
+      }
+      likes {
+        user
+        createdAt
+      }
     }
   }
 `;

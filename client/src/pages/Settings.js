@@ -11,6 +11,8 @@ import {
 } from '../graphql/mutations';
 
 import LoadingSpinner from '../components/utils/LoadingSpinner';
+import ErrorCard from '../components/utils/ErrorCard';
+import SuccessCard from '../components/utils/SuccessCard';
 import styles from '../styles/Settings.module.css';
 import noProfpic from '../media/no-profpic.png';
 import noBackgroundImg from '../media/no-background.jpg';
@@ -22,6 +24,7 @@ const Settings = () => {
   const [changed, setChanged] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState();
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState();
   const [password, setPassword] = useState({
     old: '',
@@ -33,6 +36,11 @@ const Settings = () => {
 
   const profilePictureInput = useRef(null);
   const backgroundImageInput = useRef(null);
+  const cleanupStates = () => {
+    setChanged(false);
+    setIsLoading(false);
+    setError();
+  };
 
   console.log('Changed: ', changed);
   console.log('ERROR: ', error);
@@ -40,6 +48,18 @@ const Settings = () => {
 
   const isTempDifferent = () => {
     return JSON.stringify(user) === JSON.stringify(userTemp);
+  };
+
+  const enablePwdBtn = () => {
+    let enable = false;
+    for (let p in password) {
+      if (password[p].length > 0) {
+        enable = true;
+      } else {
+        enable = false;
+      }
+    }
+    return enable;
   };
 
   useEffect(() => {
@@ -50,6 +70,7 @@ const Settings = () => {
     if (user) {
       setUserTemp(user);
     }
+    setIsLoading(false);
   }, [user]);
 
   useEffect(() => {
@@ -62,6 +83,12 @@ const Settings = () => {
     }
   }, [userTemp, newProfpic, newBgImage]);
 
+  const onSuccess = () => {
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 2000);
+    setChanged(false);
+  };
+
   const [
     updateUser,
     { data: updateData, loading: updateLoading, error: updateError },
@@ -70,6 +97,7 @@ const Settings = () => {
       if (data) {
         console.log('updateUser data: ', data);
         setUser(data.updateUser);
+        onSuccess();
       }
     },
   });
@@ -84,7 +112,7 @@ const Settings = () => {
         console.log('After Changing Password: ', data);
         setUser(data.changePassword);
         setPassword({ old: '', new: '', confirm: '' });
-        // window.location.reload();
+        onSuccess();
       }
     },
   });
@@ -104,6 +132,28 @@ const Settings = () => {
     },
   });
 
+  // Handle isLoading state by graphql mutation
+  useEffect(() => {
+    let load = updateLoading || pwdLoading;
+    setIsLoading(load);
+  }, [updateLoading, pwdLoading]);
+
+  // Handle error state from graphql mutation
+  useEffect(() => {
+    for (let e of [picError, pwdError, updateError]) {
+      // console.log('ERROR: ', e);
+      if (e !== undefined && e) {
+        let errorText = e.graphQLErrors[0].message;
+        // console.log('ERROR CHECK: ', errorText);
+        setError(errorText);
+      }
+    }
+    // if (!picError && !pwdError && !updateError) {
+    //   setError(null);
+    // }
+  }, [picError, pwdError, updateError]);
+
+  // Helper functions
   const onDetailChange = (e, key) => {
     e.preventDefault();
     e.stopPropagation();
@@ -118,10 +168,6 @@ const Settings = () => {
       u[`${key}`] = value;
       setUserTemp(u);
     }
-  };
-
-  const validateInputs = () => {
-    return;
   };
 
   const imageChangeHandler = (e, type) => {
@@ -201,7 +247,7 @@ const Settings = () => {
     e.stopPropagation();
 
     setUserTemp(user);
-    setChanged(false);
+    cleanupStates();
     return;
   };
 
@@ -269,9 +315,23 @@ const Settings = () => {
               onClick={() => backgroundImageInput.current.click()}
               className={styles.backgroundButton}
             >
-              Change Background Image
+              {user.bgPictureUrl === ''
+                ? 'Upload Background Image'
+                : 'Change Background Image'}
             </button>
           </div>
+          {/* SUCCESS & ERROR CARDS */}
+          {success ? (
+            <div style={{ paddingTop: '2rem', paddingBottom: '-2rem' }}>
+              <SuccessCard text='Success updating!' />
+            </div>
+          ) : null}
+          {error ? (
+            <div style={{ paddingTop: '1rem' }}>
+              <ErrorCard error={error} />
+            </div>
+          ) : null}
+
           <span className={styles.title}>Profile Settings</span>
           <div className={styles.main}>
             <div className={styles.imgArea}>
@@ -294,7 +354,9 @@ const Settings = () => {
                   onClick={() => profilePictureInput.current.click()}
                   className={styles.profpicButton}
                 >
-                  Change Profile Picture
+                  {user.profilePictureUrl === ''
+                    ? 'Upload Profile Picture'
+                    : 'Change Profile Picture'}
                 </button>
               </div>
             </div>
@@ -346,14 +408,14 @@ const Settings = () => {
                   disabled={!changed}
                   className={styles.saveButton}
                 >
-                  Save Changes
+                  {isLoading ? <LoadingSpinner /> : 'Save Changes'}
                 </button>
                 <button
                   onClick={cancelChangeHandler}
                   disabled={!changed}
                   className={styles.cancelButton}
                 >
-                  Cancel All
+                  {isLoading ? <LoadingSpinner /> : 'Cancel All'}
                 </button>
               </div>
               <div className={styles.changePassword}>
@@ -418,10 +480,11 @@ const Settings = () => {
                   }}
                 >
                   <button
+                    disabled={isLoading || !enablePwdBtn()}
                     onClick={onChangePassword}
                     className={styles.passwordButton}
                   >
-                    Change Password
+                    {isLoading ? <LoadingSpinner /> : 'Change Password'}
                   </button>
                 </div>
               </div>

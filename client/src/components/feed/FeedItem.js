@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router';
 import { useMutation } from '@apollo/client';
 import { FaRegComment as CommentIcon } from 'react-icons/fa';
 import { AiFillLike as LikeIcon } from 'react-icons/ai';
+import { BsFillTrashFill } from 'react-icons/bs';
 
 import FeedImage from './FeedImage';
 import CommentSection from './CommentSection';
 import useUserDetail from '../../hooks/useUserDetail';
 import { timeString } from '../../utils/numberToString';
 
-import { LIKE_POST, UNLIKE_POST } from '../../graphql/mutations';
+import { DELETE_POST, LIKE_POST, UNLIKE_POST } from '../../graphql/mutations';
 import NewComment from './NewComment';
 import UserContext from '../../context/UserContext';
 import { getLocalData } from '../../utils/handleUserAuth';
@@ -18,7 +19,7 @@ import { countString } from '../../utils/numberToString';
 import styles from '../../styles/Feed.module.css';
 import noProfpic from '../../media/no-profpic.png';
 
-const FeedItem = ({ feed, alwaysOpen }) => {
+const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
   // TODO: GET user data from GraphQL API
   const [userDetail, __] = useUserDetail(feed.user);
   const [token, setToken] = useState();
@@ -28,9 +29,7 @@ const FeedItem = ({ feed, alwaysOpen }) => {
   const [openComments, setOpenComments] = useState(false);
 
   const { userDetail: clientDetail, _ } = useContext(UserContext);
-
-  console.log('userDetail on FeedItem: ', userDetail);
-
+  console.log('FEED DATA: ', feedData);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,6 +72,21 @@ const FeedItem = ({ feed, alwaysOpen }) => {
     }
   }, [unlikeData]);
 
+  // --- Delete post
+  const [
+    deletePost,
+    { data: deleteData, loading: deleteLoading, error: deleteError },
+  ] = useMutation(DELETE_POST);
+  useEffect(() => {
+    console.log('DELET POST DATA: ', deleteData);
+    if (deleteData) {
+      if (deleteData.deletePost.success === true) {
+        const deletedPostId = deleteData.deletePost.postId;
+        onFeedDeleted(deletedPostId);
+      }
+    }
+  }, [deleteData]);
+
   const likeHandler = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -91,6 +105,19 @@ const FeedItem = ({ feed, alwaysOpen }) => {
         unlikePost(config);
       }
     }
+  };
+
+  const onRemoveButtonClick = (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    deletePost({
+      variables: { id },
+      context: {
+        headers: { authorization: token },
+      },
+      fetchPolicy: 'no-cache',
+    });
   };
 
   if (!userDetail || !feedData) {
@@ -128,6 +155,7 @@ const FeedItem = ({ feed, alwaysOpen }) => {
         </a>
 
         <div className={styles.itemDetails}>
+          {/* Name & Username */}
           <div
             className={styles.itemUser}
             onClick={(e) => {
@@ -139,6 +167,15 @@ const FeedItem = ({ feed, alwaysOpen }) => {
             <div>
               <p className={styles.itemUsername}>@{userDetail.username}</p>
             </div>
+            {userDetail.id === clientDetail.id ? (
+              <button
+                onClick={(e) => onRemoveButtonClick(e, feedData.id)}
+                className={styles.removePostButton}
+              >
+                <BsFillTrashFill />
+                <p>Remove</p>
+              </button>
+            ) : null}
           </div>
           <div className='has-text-grey-light'>
             {timeString(new Date(feedData.createdAt))}

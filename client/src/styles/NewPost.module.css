@@ -11,6 +11,7 @@
   margin-bottom: 1rem;
   flex-direction: row;
   background-color: white;
+  position: relative;
 }
 
 .profilePicture {
@@ -107,6 +108,7 @@
 .previewImg {
   max-height: 150px;
   margin: 0.5rem 0.5rem;
+  max-width: 100%;
 }
 
 .previewImgText {

@@ -11,7 +11,7 @@ import { getLocalData } from '../../utils/handleUserAuth';
 import noProfpic from '../../media/no-profpic.png';
 import styles from '../../styles/NewPost.module.css';
 
-const NewPost = ({ userDetail }) => {
+const NewPost = ({ userDetail, onNewPost }) => {
   const [text, setText] = useState('');
   const [token, setToken] = useState();
   const [error, setError] = useState();
@@ -42,7 +42,7 @@ const NewPost = ({ userDetail }) => {
   };
 
   const onFileChange = (e) => {
-    let imgArr = [];
+    let imgArr = [...images];
 
     // FileList of images selected
     const files = e.target.files;
@@ -64,14 +64,16 @@ const NewPost = ({ userDetail }) => {
       setText('');
       setImages([]);
       setSuccess(true);
+      onNewPost(data.createPost);
       setTimeout(() => {
         setSuccess(false);
-      }, 5000);
+      }, 3000);
     }
   };
-
   useEffect(() => {
-    onDataReturned(data);
+    if (data) {
+      onDataReturned(data);
+    }
   }, [data]);
 
   if (err) console.log(err);
@@ -106,7 +108,7 @@ const NewPost = ({ userDetail }) => {
     <div className={styles.container}>
       {error ? <ErrorCard error={error} /> : null}
       <img src={profpic} className={styles.profilePicture} />
-      <div className={styles.postInput} style={{ position: 'relative' }}>
+      <div className={styles.postInput}>
         {loading ? <LoadingFull /> : null}
         {success ? <SuccessCard text={successText} /> : null}
         <textarea
@@ -135,6 +137,7 @@ const NewPost = ({ userDetail }) => {
                   margin: '0.2rem',
                   border: '0.5px solid lightgrey',
                   display: 'flex',
+                  maxWidth: 'fit-content',
                 }}
               >
                 <img
@@ -160,9 +163,9 @@ const NewPost = ({ userDetail }) => {
               <MdAddPhotoAlternate className={styles.option} size='30px' />
             </label>
           </div>
-          <a className={styles.optionDiv}>
+          {/* <a className={styles.optionDiv}>
             <MdOutlinePoll className={styles.option} size='30px' />
-          </a>
+          </a> */}
           <button className={styles.postButton} onClick={onPostSubmit}>
             Post
           </button>

@@ -7,10 +7,11 @@ const { uploadImageS3 } = require('../../storage/imageHandlerS3');
 const {
   validateRegister,
   validateLogin,
-  checkPasswordStrength,
   validateUpdate,
+  isPasswordStrong,
 } = require('../../utils/validateUserInputs');
 const { validateToken } = require('../../utils/validateToken');
+const { checkIdValid } = require('../../utils/validateId');
 const { SECRET_KEY } = require('../../config');
 
 // Helper functions
@@ -59,7 +60,10 @@ const passwordHandler = async (inputPassword, userPassword) => {
 module.exports = {
   Query: {
     async getUser(_, { id }) {
-      console.log('getUser id: ', id);
+      const isValidId = checkIdValid(id);
+      if (!isValidId) {
+        throw new UserInputError('User ID is incorrect');
+      }
       const res = await User.findById(id);
       console.log('getUser res: ', res);
       if (!res) {
@@ -142,7 +146,7 @@ module.exports = {
       const res = await newUser.save();
 
       // TODO: Return LoginRegisterResponse typeDefs
-      const token = generateToken(res._id, '1h');
+      const token = generateToken(res._id, TOKEN_EXP_DURATION);
       return {
         userId: res._id,
         token: token,
@@ -214,8 +218,29 @@ module.exports = {
       }
       const userId = decoded.id;
 
-      // TODO: User data from DB & Update it
+      // TODO: Check username & email in DB
+      // If it exists, EXCEPT when it's this user's username or email, throw error
       const { username, fullname, email, bio, location } = validatedInput;
+      const checkUsername = await User.findOne({ username: username });
+      if (checkUsername) {
+        console.log('checkUsername: ', checkUsername);
+        if (checkUsername._id != userId) {
+          throw new UserInputError(
+            `Username: "@${username}" already exists. Please pick another username`
+          );
+        }
+      }
+      const checkEmailUser = await User.findOne({ email: email });
+      if (checkEmailUser) {
+        console.log(checkEmailUser);
+        if (checkEmailUser._id != userId) {
+          throw new UserInputError(
+            `Email: "${email}" already registered. Please pick other email`
+          );
+        }
+      }
+
+      // TODO: User data from DB & Update
       const user = await User.findById(userId);
       if (!user) {
         throw new UserInputError('No such account exists. Please login again');
@@ -410,7 +435,7 @@ module.exports = {
         );
       }
       // Password strength
-      const isPwdStrong = checkPasswordStrength(newPassword);
+      const isPwdStrong = isPasswordStrong(newPassword);
       if (!isPwdStrong) {
         throw new UserInputError('New Password is not strong enough');
       }

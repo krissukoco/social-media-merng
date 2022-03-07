@@ -1,10 +1,14 @@
 .errorCard {
   background-color: red;
   color: white;
+  margin: 1rem auto;
   margin-bottom: 1rem;
-  padding: 1rem;
+  padding: 1rem 2rem;
   border-radius: 5px;
   font-size: 0.8rem;
+  max-width: max-content;
+  height: fit-content;
+  text-align: center;
 }
 
 .errorList {
@@ -15,18 +19,20 @@
 
 .successCard {
   position: absolute;
-  left: 0;
   right: 0;
+  left: 0;
   width: 12rem;
   justify-content: center;
+  justify-self: center;
   margin: auto;
-  padding: 0.6rem 1rem;
+  padding: 0.4rem 1rem;
   background-color: lightcyan;
   text-align: center;
   font-size: 0.9rem;
   color: black;
   border: 0.5px solid lightblue;
-  border-radius: 10px;
+  border-radius: 15px;
+  z-index: 999999;
 }
 
 .loadingButton {

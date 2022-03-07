@@ -9,7 +9,7 @@ const regExUsername = /^[a-zA-Z0-9]{3,20}$/;
 const regExPassword =
   /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 
-module.exports.checkPasswordStrength = (password) => {
+module.exports.isPasswordStrong = (password) => {
   return password.match(regExPassword);
 };
 
@@ -77,10 +77,12 @@ module.exports.validateUpdate = (input) => {
   }
 
   let { username, fullname, email, bio, location } = input;
-
-  for (let field of [username, fullname, email]) {
-    if (!field || field.trim().length === 0) {
-      errors.push(`${Object.keys(field)[0]} field cannot be empty`);
+  for (let field of [{ username }, { name: fullname }, { email }]) {
+    console.log('FIELD: ', field);
+    if (!field || Object.values(field)[0].trim().length === 0) {
+      errors.push(
+        `${Object.keys(field)[0].toUpperCase()} field cannot be empty`
+      );
     }
   }
 

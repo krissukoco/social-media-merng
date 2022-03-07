@@ -14,6 +14,7 @@ const useFeed = (limit) => {
   const [token, setToken] = useState();
 
   let loading = true;
+  let error = null;
 
   useEffect(() => {
     const { _, token: localToken } = getLocalData();
@@ -33,7 +34,6 @@ const useFeed = (limit) => {
       },
     },
     fetchPolicy: 'no-cache',
-    onError: (error) => console.log(error),
     onCompleted: (data) => {
       if (data != undefined) {
         setLatestPosts(data.getFeedLatest);
@@ -53,13 +53,23 @@ const useFeed = (limit) => {
       },
     },
     fetchPolicy: 'no-cache',
-    onError: (error) => console.log(error),
     onCompleted: (data) => {
       if (data != undefined) {
         setFollowingPosts(data.getFeedFollowing);
       }
     },
   });
+
+  // When GraphQL error changes everytime, change error
+  useEffect(() => {
+    if (latestError) {
+      error = latestError.message;
+    } else if (folError) {
+      error = folError.message;
+    } else {
+      error = null;
+    }
+  }, [latestError, folError]);
 
   // When dependency (e.g. activeTab) changes, change the posts state
   useEffect(() => {
@@ -80,13 +90,14 @@ const useFeed = (limit) => {
     } else {
       loading = false;
     }
-  }, [activeTab, latestPosts, followingPosts]);
+  }, [activeTab, latestPosts, followingPosts, folLoading, latestLoading]);
 
   return {
     posts,
     loading: folLoading || latestLoading,
     activeTab,
     setActiveTab,
+    error,
   };
 };
 

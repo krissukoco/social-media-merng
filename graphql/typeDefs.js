@@ -62,6 +62,7 @@ module.exports = gql`
     token: String!
   }
   type DeletedPostResponse {
+    success: Boolean!
     postId: ID!
     deletedAt: String!
   }
@@ -110,10 +111,6 @@ module.exports = gql`
     images: [Upload]!
     poll: PollInput
   }
-  input DeletePostInput {
-    postId: ID!
-    token: String!
-  }
   input ImageInput {
     uri: String!
     filename: String!
@@ -125,7 +122,7 @@ module.exports = gql`
   type Query {
     getSelf: User
     getUser(id: ID!): User
-    getPost(id: ID!): Post!
+    getPost(id: ID!): Post
     getImage(id: ID!): ImageResponse!
     getPostsByUser(userId: ID!, limit: Int!): [Post]!
     getFeedFollowing(limit: Int): [Post]!
@@ -145,7 +142,7 @@ module.exports = gql`
     ): User
     uploadPersonalPicture(image: Upload!, type: String!): User
     createPost(input: CreatePostInput!): Post
-    deletePost(input: DeletePostInput!): DeletedPostResponse!
+    deletePost(id: ID!): DeletedPostResponse!
     createComment(postId: ID!, text: String!): Post
     likePost(postId: ID!): Post
     unlikePost(postId: ID!): Post

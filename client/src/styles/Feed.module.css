@@ -21,6 +21,7 @@ a:hover {
   flex-direction: row;
   width: 100%;
   padding-bottom: 4rem;
+  position: relative;
 }
 
 .leftBar {
@@ -28,6 +29,8 @@ a:hover {
   display: flex;
   flex-direction: column;
   max-height: max-content;
+  min-width: 18rem;
+  justify-self: center;
 }
 
 .feed {
@@ -35,9 +38,9 @@ a:hover {
   padding: 0 2rem;
 }
 
-.rightBar {
+/* .rightBar {
   width: 15%;
-}
+} */
 
 .postBody:focus {
   min-height: 5rem;
@@ -103,6 +106,16 @@ a:hover {
   transition: 0.2s ease-in-out;
 }
 
+.statusCardContainer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin: auto;
+  padding: auto;
+  justify-content: center;
+}
+
 /* FeedItem */
 .feedItemContainer {
   display: flex;
@@ -111,6 +124,7 @@ a:hover {
   padding: 1rem 1rem;
   border-radius: 0.5rem;
   outline: transparent;
+  position: relative;
 }
 
 .feedItemContainer:hover {
@@ -164,4 +178,52 @@ a:hover {
 
 .imageArrow:hover {
   opacity: 100%;
+}
+
+.removePostButton {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  background-color: red;
+  color: white;
+  position: absolute;
+  right: 0;
+  padding: 0.3rem 0.3rem;
+  border: none;
+  border-radius: 5px;
+  margin-right: 2rem;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+}
+
+.removePostButton > * {
+  margin: 0 0.2rem;
+  align-self: center;
+}
+
+.removePostButton:hover {
+  background-color: darkred;
+  transition: 0.2s ease-in-out;
+}
+
+/* POST PAGE */
+.postErrorContainer {
+  align-self: flex-start;
+  height: max-content;
+  margin: auto;
+}
+
+.postIsDeleted {
+  text-align: center;
+  padding: 2rem;
+  background-color: white;
+}
+
+.postIsDeleted > h2 {
+  color: black;
+  font-size: 1.1rem;
+}
+
+.postIsDeleted > h2 > a {
+  color: var(--primary-blue-color);
 }

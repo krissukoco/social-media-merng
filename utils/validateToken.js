@@ -9,14 +9,16 @@ module.exports.validateToken = (token) => {
   const now = () => Date.now();
 
   if (!token || token == 'undefined') {
-    errors.push('Must provide a JWT token');
+    errors.push('You have to be authenticated');
     return { valid, decoded, errors };
   }
 
   if (token.length > 0) {
-    console.log('Original token: ', token);
-    token = token.replace('Bearer ', '');
-    console.log('Token inputed: ', token);
+    token = token.split('Bearer ')[1];
+    if (!token) {
+      errors.push('Provided auth token is not in the correct format');
+      return { valid, decoded, errors };
+    }
 
     // TODO: Decrypt, make sure it has data
     try {
@@ -26,8 +28,8 @@ module.exports.validateToken = (token) => {
         errors.push('Token is invalid');
       }
     } catch (error) {
-      console.log('error while verifying jwt: ', error);
-      errors.push(error);
+      console.log('ERROR while verifying jwt: ', error.message);
+      errors.push(error.message);
     }
 
     console.log('Decoded token: ', decoded);
