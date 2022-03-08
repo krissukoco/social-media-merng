@@ -23,6 +23,7 @@ async function startServer() {
     });
     const app = express();
     app.use(graphqlUploadExpress());
+    app.use(express.static('public'));
     app.get('*', (req, res) => {
       res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
     });
