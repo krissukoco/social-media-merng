@@ -4,9 +4,9 @@
   "description": "Social Media using MERNG stack",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js",
-    "serve": "node index.js"
+    "start": "node index.js",
+    "serve": "node index.js",
+    "client": "npm start --prefix client"
   },
   "author": "RKS",
   "license": "ISC",
