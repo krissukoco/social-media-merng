@@ -28,7 +28,7 @@ async function startServer() {
     });
 
     await server.start();
-    server.applyMiddleware({ app });
+    server.applyMiddleware({ path: '/', app });
 
     await new Promise((r) => app.listen({ port: PORT }, r));
     console.log(
