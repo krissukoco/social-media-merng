@@ -2,12 +2,14 @@ const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
 const express = require('express');
 const { GraphQLUpload, graphqlUploadExpress } = require('graphql-upload');
+require('dotenv').config();
 
-const { PORT, MONGODB_URL } = require('./config');
 const Post = require('./models/Post');
 const User = require('./models/User');
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
+const PORT = process.env.PORT;
+const MONGODB_URL = process.env.MONGODB_URL;
 
 async function startServer() {
   try {
@@ -33,14 +35,3 @@ async function startServer() {
 }
 
 startServer();
-
-// mongoose
-//   .connect(MONGODB_URL)
-//   .then(() => {
-//     console.log('MongoDB connected successfully');
-//     return server.listen({ port: PORT });
-//   })
-//   .then((res) => {
-//     console.log(`Server running at ${res.url}`);
-//   })
-//   .catch((e) => console.error(e.message));

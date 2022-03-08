@@ -12,10 +12,7 @@ module.exports.uploadImageS3 = async (filePromises) => {
     (values) => (files = values)
   );
 
-  console.log('FILES AWAIT: ', files);
-
   for (let file of files) {
-    console.log(file);
     const { createReadStream, filename, mimetype, encoding } = file;
 
     try {
@@ -28,7 +25,6 @@ module.exports.uploadImageS3 = async (filePromises) => {
           ContentType: mimetype,
         })
         .promise();
-      console.log('S3 Result: ', s3Result);
 
       const image = {
         filename,
@@ -39,18 +35,16 @@ module.exports.uploadImageS3 = async (filePromises) => {
 
       images.push(image);
     } catch (error) {
-      console.log('Error uploadImage: ', error.message);
+      console.error('ERROR uploadImage: ', error.message);
       success = false;
       images = [];
       return { success, images };
     }
   }
-  console.log('Images final: ', images);
 
   // Make sure ALL IMAGES are successfully uploaded
-  if (images.length == filePromises.length) {
+  if (images.length === filePromises.length) {
     success = true;
   }
-  console.log('imageHandlerS3 return: ', { success, images });
   return { success, images };
 };

@@ -37,8 +37,6 @@ const Post = () => {
       setError();
     }
   }, [postError]);
-  console.log('Post.js error: ', error);
-  console.log('Post.js post: ', post);
 
   // Show "Post Deleted", then setTimeout to back to feed
   const onFeedDeleted = (id) => {

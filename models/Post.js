@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
-const pollSchema = require('./schema/pollSchema');
+// const pollSchema = require('./schema/pollSchema');
 
 // TYPES OF POSTS:
-// "standard": body only (twitter-like)
-// "image": image with captions (instagram-like)
-// "poll": poll with caption (linkedin/youtube-like)
+// "standard": body only
+// "image": body + image
 
 const postSchema = new mongoose.Schema({
   body: { type: String, required: true },
@@ -15,7 +14,6 @@ const postSchema = new mongoose.Schema({
   },
   postType: { type: String, required: true },
   imgUrls: [{ type: String, required: true }],
-  poll: pollSchema,
   createdAt: {
     type: String,
     required: true,

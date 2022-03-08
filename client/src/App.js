@@ -1,5 +1,4 @@
 import './App.css';
-import { useState, useContext } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -21,11 +20,7 @@ import NotFound from './pages/NotFound';
 import useClientDetail from './hooks/useClientDetail';
 
 function App() {
-  // const [userDetail, setUserDetail] = useState();
-
   const [userDetail, setUserDetail] = useClientDetail();
-
-  console.log('App.js userDetail: ', userDetail);
 
   return (
     <UserContext.Provider value={{ userDetail, setUserDetail }}>
@@ -33,7 +28,7 @@ function App() {
         <Routes>
           <Route
             index
-            element={userDetail !== null ? <Navigate to='/feed' /> : <Home />}
+            element={userDetail ? <Navigate to='/feed' /> : <Home />}
           />
           <Route path='/feed' element={<Feed />} />
           <Route path='/post/:id' element={<Post />} />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import PasswordTooltip from '../../components/utils/PasswordTooltip';
 import styles from '../../styles/LoginRegister.module.css';
 
 const SignupInput = () => {
@@ -8,10 +9,19 @@ const SignupInput = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPasswordTooltip, setShowPasswordTooltip] = useState(false);
 
   const onValueChange = (ev, setter) => {
     ev.preventDefault();
     setter(ev.target.value);
+  };
+
+  const onPasswordFocused = () => {
+    setShowPasswordTooltip(true);
+  };
+
+  const onPasswordUnfocused = () => {
+    setShowPasswordTooltip(false);
   };
 
   return (
@@ -40,7 +50,11 @@ const SignupInput = () => {
         value={username}
         onChange={(e) => onValueChange(e, setUsername)}
       />
+      {showPasswordTooltip ? <PasswordTooltip /> : null}
       <input
+        style={{ position: 'relative' }}
+        onFocus={onPasswordFocused}
+        onBlur={onPasswordUnfocused}
         type='password'
         placeholder='Password'
         className={styles.input}

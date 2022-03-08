@@ -73,15 +73,11 @@ const useFeed = (limit) => {
 
   // When dependency (e.g. activeTab) changes, change the posts state
   useEffect(() => {
-    console.log('useEffect CALLED with activeTab value = ', activeTab);
     if (activeTab === 'latest') {
-      console.log('GO LATEST');
       setPosts([...latestPosts]);
     } else if (activeTab == 'followings') {
-      console.log('GO FOLLOWING');
       setPosts([...followingPosts]);
     } else {
-      console.log('GO DEFAULT');
       setPosts([...latestPosts]);
     }
 

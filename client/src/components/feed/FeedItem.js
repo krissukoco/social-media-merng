@@ -7,7 +7,10 @@ import { BsFillTrashFill } from 'react-icons/bs';
 
 import FeedImage from './FeedImage';
 import CommentSection from './CommentSection';
+import ErrorCard from '../utils/ErrorCard';
+import SuccessCard from '../utils/SuccessCard';
 import useUserDetail from '../../hooks/useUserDetail';
+import { onGraphqlError } from '../../utils/handleAPIError';
 import { timeString } from '../../utils/numberToString';
 
 import { DELETE_POST, LIKE_POST, UNLIKE_POST } from '../../graphql/mutations';
@@ -20,17 +23,18 @@ import styles from '../../styles/Feed.module.css';
 import noProfpic from '../../media/no-profpic.png';
 
 const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
-  // TODO: GET user data from GraphQL API
   const [userDetail, __] = useUserDetail(feed.user);
   const [token, setToken] = useState();
   const [isLiked, setIsLiked] = useState(false);
   const [feedData, setFeedData] = useState(feed);
   const [likesCount, setLikesCount] = useState(0);
   const [openComments, setOpenComments] = useState(false);
+  const [error, setError] = useState();
 
   const { userDetail: clientDetail, _ } = useContext(UserContext);
-  console.log('FEED DATA: ', feedData);
   const navigate = useNavigate();
+
+  let timer;
 
   useEffect(() => {
     const { token: t } = getLocalData();
@@ -44,6 +48,7 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
         setIsLiked(liked);
       }
     }
+    clearTimeout(timer);
   }, [feedData]);
 
   let profpic = noProfpic;
@@ -52,11 +57,17 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
   }
 
   // --- Like post
-  const [likePost, { data: likeData, loading, error: likeError }] =
-    useMutation(LIKE_POST);
+  const [likePost, { data: likeData, loading, error: likeError }] = useMutation(
+    LIKE_POST,
+    {
+      onError: (e) => {
+        onGraphqlError(e, setError, timer);
+      },
+    }
+  );
 
   useEffect(() => {
-    if (likeData) {
+    if (likeData && !likeError) {
       setFeedData(likeData.likePost);
     }
   }, [likeData]);
@@ -65,9 +76,11 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
   const [
     unlikePost,
     { data: unlikeData, loading: unlikedLoading, error: unlikeError },
-  ] = useMutation(UNLIKE_POST);
+  ] = useMutation(UNLIKE_POST, {
+    onError: onGraphqlError,
+  });
   useEffect(() => {
-    if (unlikeData) {
+    if (unlikeData && !unlikeError) {
       setFeedData(unlikeData.unlikePost);
     }
   }, [unlikeData]);
@@ -76,9 +89,10 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
   const [
     deletePost,
     { data: deleteData, loading: deleteLoading, error: deleteError },
-  ] = useMutation(DELETE_POST);
+  ] = useMutation(DELETE_POST, {
+    onError: onGraphqlError,
+  });
   useEffect(() => {
-    console.log('DELET POST DATA: ', deleteData);
     if (deleteData) {
       if (deleteData.deletePost.success === true) {
         const deletedPostId = deleteData.deletePost.postId;
@@ -90,20 +104,18 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
   const likeHandler = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // TODO: Sync with DB
-    if (token) {
-      const config = {
-        variables: { postId: feedData.id },
-        context: {
-          headers: { authorization: token },
-        },
-        fetchPolicy: 'no-cache',
-      };
-      if (!isLiked) {
-        likePost(config);
-      } else if (isLiked) {
-        unlikePost(config);
-      }
+    // Sync with DB
+    const config = {
+      variables: { postId: feedData.id },
+      context: {
+        headers: { authorization: token },
+      },
+      fetchPolicy: 'no-cache',
+    };
+    if (!isLiked) {
+      likePost(config);
+    } else if (isLiked) {
+      unlikePost(config);
     }
   };
 
@@ -129,7 +141,6 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
       onClick={(e) => {
         e.stopPropagation();
         e.bubbles = false;
-        console.log(e);
         navigate(`/post/${feedData.id}`);
       }}
       style={{ marginBottom: '1rem' }}
@@ -167,7 +178,7 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
             <div>
               <p className={styles.itemUsername}>@{userDetail.username}</p>
             </div>
-            {userDetail.id === clientDetail.id ? (
+            {!clientDetail ? null : userDetail.id === clientDetail.id ? (
               <button
                 onClick={(e) => onRemoveButtonClick(e, feedData.id)}
                 className={styles.removePostButton}
@@ -176,8 +187,11 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
                 <p>Remove</p>
               </button>
             ) : null}
+            <div className={styles.itemNotifContainer}>
+              {error ? <ErrorCard error={error} /> : null}
+            </div>
           </div>
-          <div className='has-text-grey-light'>
+          <div style={{ color: 'grey' }}>
             {timeString(new Date(feedData.createdAt))}
           </div>
           <div className={styles.feedBody}>

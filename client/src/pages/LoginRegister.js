@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import LoginInput from '../components/loginRegister/LoginInput';
 import SignupInput from '../components/loginRegister/SignupInput';
 import ErrorCard from '../components/utils/ErrorCard';
+import { onGraphqlError } from '../utils/handleAPIError';
 
 import { LOGIN_USER, REGISTER_USER } from '../graphql/mutations';
 import {
@@ -14,7 +15,6 @@ import {
   saveLocalData,
   deleteLocalData,
 } from '../utils/handleUserAuth';
-import UserContext from '../context/UserContext';
 import styles from '../styles/LoginRegister.module.css';
 import logo from '../media/logo-horizontal.png';
 
@@ -28,6 +28,7 @@ const LoginRegister = ({ page }) => {
     });
   };
   let navigate = useNavigate();
+  let timer;
 
   const [pageType, setPageType] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +47,9 @@ const LoginRegister = ({ page }) => {
       setPageType(page);
     } else {
       setPageType('login');
-      console.log("page type not supported. Returning 'login'");
     }
+
+    clearTimeout(timer);
   }, [pageType]);
 
   // When page change from Log In to Sign Up and vv
@@ -56,12 +58,6 @@ const LoginRegister = ({ page }) => {
     setError();
     setText(getTexts(page));
   }, [pageType, text]);
-
-  function onAPIError(err) {
-    // let newErrors = [];
-    // err.graphQLErrors.map((e) => newErrors.push(e.message));
-    setError(err.graphQLErrors[0].message);
-  }
 
   // If login/signup is success
   function onSuccess(result) {
@@ -79,7 +75,7 @@ const LoginRegister = ({ page }) => {
     update: (_, result) => {
       onSuccess(result.data.registerUser);
     },
-    onError: (error) => onAPIError(error),
+    onError: (err) => onGraphqlError(err, setError, timer),
   });
 
   const [loginUser, { loginData, loading: loginLoading, error: loginError }] =
@@ -87,9 +83,8 @@ const LoginRegister = ({ page }) => {
       update: (_, result) => {
         onSuccess(result.data.loginUser);
       },
-      onError: (error) => {
-        console.log(error.graphQLErrors);
-        onAPIError(error);
+      onError: (err) => {
+        onGraphqlError(err, setError, timer);
       },
     });
 
@@ -102,11 +97,7 @@ const LoginRegister = ({ page }) => {
     }
   }, [registerLoading, loginLoading]);
 
-  console.log('GraphQL Register Data: ', registerData);
-  console.log('GraphQL Login Data: ', loginData);
-  console.log('Error', error);
-
-  // TODO: Make mutation to GraphQL endpoint
+  // Mutation to GraphQL endpoint
   const onSubmit = (ev) => {
     ev.preventDefault();
     let variables = {};
@@ -158,6 +149,7 @@ const LoginRegister = ({ page }) => {
               {/* Share your sports. Let others appreciate. */}
             </h1>
           </div>
+          {error ? <ErrorCard error={error} /> : null}
           <div>
             <h3 style={{ fontSize: '1.1rem', color: 'rgb(166,166,166)' }}>
               {ReactHrmlParser(text.secondary)}
@@ -172,7 +164,7 @@ const LoginRegister = ({ page }) => {
             noValidate
           >
             {pageType == 'login' ? <LoginInput /> : <SignupInput />}
-            {error ? <ErrorCard error={error} /> : null}
+
             <button className={styles.mainButton} type='submit'>
               {isLoading ? (
                 <img src={spinnerBlue} width='20px' />

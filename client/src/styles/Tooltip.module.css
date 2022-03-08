@@ -1,0 +1,31 @@
+@import '../App.css';
+
+.tooltipContainer {
+  /* background-color: var(--darker-blue-color); */
+  position: absolute;
+  background-color: var(--darker-blue-color);
+  color: white;
+  left: 0;
+  right: 0;
+  margin: auto;
+  padding: 1rem 1.5rem;
+  border-radius: 25px;
+  border: 0.5px solid grey;
+  max-width: 25rem;
+  height: fit-content;
+}
+
+.tooltipContainer .tooltip {
+  font-size: 0.9rem;
+}
+.content > p {
+  font-weight: bold;
+  padding-bottom: 0.7rem;
+  font-size: 1.1rem;
+}
+
+.content > ul {
+  text-align: left;
+  margin-left: 2rem;
+  color: white;
+}

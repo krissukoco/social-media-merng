@@ -18,7 +18,7 @@ const useUserDetail = (userId) => {
       },
     },
     onError: (err) => {
-      console.log('useUsertDetail error: ', err);
+      throw new Error(err.graphQLErrors[0].message);
     },
     onCompleted: (data) => {
       setUserDetail(data.getUser);

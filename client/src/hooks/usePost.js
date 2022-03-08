@@ -23,7 +23,6 @@ const usePost = (postId) => {
     fetchPolicy: 'no-cache',
     onCompleted: (data) => {
       if (data != undefined) {
-        console.log('FROM userPost: ', data);
         setPost(data.getPost);
       }
     },

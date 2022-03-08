@@ -4,13 +4,14 @@ import { useMutation } from '@apollo/client';
 import { CREATE_COMMENT } from '../../graphql/mutations';
 import { getLocalData } from '../../utils/handleUserAuth';
 import LoadingFull from '../utils/LoadingFull';
+import ErrorCard from '../utils/ErrorCard';
 import styles from '../../styles/Comment.module.css';
 import noProfpic from '../../media/no-profpic.png';
 
 const NewComment = ({ feed, client, setFeed }) => {
   const [text, setText] = useState('');
   const [token, setToken] = useState('');
-  const [posted, setPosted] = useState(false);
+  const [error, setError] = useState();
 
   const postId = feed.id;
 
@@ -27,20 +28,26 @@ const NewComment = ({ feed, client, setFeed }) => {
   const onDataReturned = (data) => {
     // Data is Post type. Make FeedItem's state to updated post
     if (data) {
-      console.log('Data returned: ', data.createComment);
       setFeed(data.createComment);
       setText('');
     }
   };
 
-  const [createComment, { data, loading, error }] = useMutation(CREATE_COMMENT);
+  const onGraphqlError = (error) => {
+    let err = error.graphQLErrors[0].message;
+    setError(err);
+  };
+
+  const [createComment, { data, loading, error: commentError }] = useMutation(
+    CREATE_COMMENT,
+    {
+      onError: onGraphqlError,
+    }
+  );
 
   useEffect(() => {
-    console.log('RAW DATA: ', data);
     onDataReturned(data);
   }, [data]);
-
-  if (error) console.log('Error new comment: ', error);
 
   const onCommentSubmit = (e) => {
     e.preventDefault();
@@ -78,7 +85,7 @@ const NewComment = ({ feed, client, setFeed }) => {
           className={styles.newCommentTextArea}
         />
         {loading ? <LoadingFull /> : null}
-
+        {error ? <ErrorCard error={error} /> : null}
         <div style={{ display: 'flex', justifyContent: 'right', right: '0' }}>
           <button onClick={onCommentSubmit} className={styles.newCommentButton}>
             Comment

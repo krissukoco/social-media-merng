@@ -17,29 +17,29 @@ module.exports.validateRegister = (input) => {
   const { fullname, email, username, password, confirmPassword } = input;
   var errors = [];
 
-  // TODO: No field should be empty
+  // No field should be empty
   for (const key in input) {
     if (input[key] == null || input[key].trim().length === 0) {
       errors.push(`Field ${key} cannot be empty`);
     }
   }
 
-  // TODO: email: match with email regEx
+  // email: match with email regEx
   if (!email.match(regExEmail)) {
     errors.push('Email format is not correct');
   }
 
-  // TODO: username: Should not consist of spaces, and non-alphanumeric characters
+  // username: Should not consist of spaces, and non-alphanumeric characters
   if (!username.match(regExUsername)) {
     errors.push('Username format is not correct');
   }
 
-  // TODO: password: Should meet the criterias
+  // password: Should meet the criterias
   if (!password.match(regExPassword)) {
     errors.push('Password not strong enough');
   }
 
-  // TODO: confirmPassword: should match with password
+  // confirmPassword: should match with password
   if (confirmPassword !== password) {
     errors.push('Passwords do not match');
   }
@@ -51,14 +51,14 @@ module.exports.validateLogin = (input) => {
   const { emailOrUsername, password } = input;
   var errors = [];
 
-  // TODO: No field should be empty
+  // No field should be empty
   for (const key in input) {
     if (input[key] == null) {
       errors.push(`Field ${key} cannot be empty`);
     }
   }
 
-  // TODO: Determine whether an email or username
+  // Determine whether an email or username
   const isEmail = emailOrUsername.match(regExEmail);
 
   return { isEmail, errors };
@@ -78,7 +78,6 @@ module.exports.validateUpdate = (input) => {
 
   let { username, fullname, email, bio, location } = input;
   for (let field of [{ username }, { name: fullname }, { email }]) {
-    console.log('FIELD: ', field);
     if (!field || Object.values(field)[0].trim().length === 0) {
       errors.push(
         `${Object.keys(field)[0].toUpperCase()} field cannot be empty`

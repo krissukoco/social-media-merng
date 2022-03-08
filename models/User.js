@@ -1,18 +1,5 @@
 const mongoose = require('mongoose');
 
-// const generateUserId = () => {
-//   // Generate unique user id as string
-//   // Formula: "<random 4-digit number>" + "-" + "<curent-date-as-string>"
-//   const now = Date.now().toString();
-//   const secondPart = now.substring(now.length - 4);
-
-//   const min = 1000;
-//   const max = 9999;
-//   const digits = (Math.floor(Math.random() * (max - min + 1)) + min).toString();
-
-//   return digits + '-' + secondPart;
-// };
-
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
   username: { type: String, required: true },

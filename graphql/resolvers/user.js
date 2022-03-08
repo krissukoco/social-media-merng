@@ -12,7 +12,7 @@ const {
 } = require('../../utils/validateUserInputs');
 const { validateToken } = require('../../utils/validateToken');
 const { checkIdValid } = require('../../utils/validateId');
-const { SECRET_KEY } = require('../../config');
+const SECRET_KEY = process.env.SECRET_KEY;
 
 // Helper functions
 const TOKEN_EXP_DURATION = '1d';
@@ -37,7 +37,7 @@ const hashPassword = async (password) => {
     const hash = await bcrypt.hash(password, salt);
     return hash;
   } catch (error) {
-    throw new ApolloError(error);
+    throw new ApolloError(error.message);
   }
 };
 
@@ -45,14 +45,12 @@ const passwordHandler = async (inputPassword, userPassword) => {
   try {
     const res = await bcrypt.compare(inputPassword, userPassword);
     if (res) {
-      console.log('Password correct');
       return true;
     } else {
       return false;
     }
   } catch (error) {
-    console.log(error);
-    throw new ApolloError(error);
+    throw new ApolloError(error.message);
   }
 };
 
@@ -65,7 +63,6 @@ module.exports = {
         throw new UserInputError('User ID is incorrect');
       }
       const res = await User.findById(id);
-      console.log('getUser res: ', res);
       if (!res) {
         throw new UserInputError(
           'No such account exists. You entered a wrong User ID'
@@ -75,7 +72,6 @@ module.exports = {
       // DO NOT SEND protected data
       const { password, _id, ...user } = res._doc;
       const resolve = { ...user, id: res._doc._id };
-      console.log('Resolve: ', resolve);
 
       return resolve;
     },
@@ -83,9 +79,9 @@ module.exports = {
     async getSelf(_, vars, { req }) {
       const token =
         req.headers.authorization == 'null' ? '' : req.headers.authorization;
-      console.log('getSelf token: ', token);
       const { valid, decoded, errors } = validateToken(token);
       if (!valid) {
+        // Not throwing an error because user doesn't have to be authenticated
         return;
       }
 
@@ -94,7 +90,7 @@ module.exports = {
       if (!res) {
         throw new UserInputError('Account does not exist');
       } else {
-        const { password, _id, ...user } = res._doc;
+        const { password, _id, __v, ...user } = res._doc;
         const resolve = { ...user, id: res._doc._id };
         return resolve;
       }
@@ -109,7 +105,7 @@ module.exports = {
     async registerUser(_, { input }) {
       const { fullname, email, username, password, confirmPassword } = input;
 
-      // TODO: Validate ALL input data
+      // Validate ALL input data
       const errors = validateRegister(input);
       if (errors.length !== 0) {
         for (let i in errors) {
@@ -117,7 +113,7 @@ module.exports = {
         }
       }
 
-      // TODO: Check either email or username is taken
+      // Check either email or username is taken
       const checkEmail = await User.findOne({ email });
       if (checkEmail) {
         throw new UserInputError(
@@ -131,10 +127,10 @@ module.exports = {
         );
       }
 
-      // TODO: Hash password
+      // Hash password
       const encryptedPwd = await hashPassword(password);
 
-      // TODO: Store user data in DB (Mongo)
+      // Store user data in DB (Mongo)
       const newUser = new User({
         email,
         username,
@@ -145,7 +141,7 @@ module.exports = {
       });
       const res = await newUser.save();
 
-      // TODO: Return LoginRegisterResponse typeDefs
+      // Return LoginRegisterResponse typeDefs
       const token = generateToken(res._id, TOKEN_EXP_DURATION);
       return {
         userId: res._id,
@@ -153,11 +149,12 @@ module.exports = {
       };
     },
 
+    // LOGIN USER
     async loginUser(_, { input }) {
       const { emailOrUsername, password } = input;
       let user;
 
-      // TODO: Validate ALL input data
+      // Validate ALL input data
       const { isEmail, errors } = validateLogin(input);
       if (errors.length !== 0) {
         for (let i = 0; i < errors.length; i++) {
@@ -165,7 +162,7 @@ module.exports = {
         }
       }
 
-      // TODO: Check email/username and compare password
+      // Check email/username and compare password
       if (isEmail) {
         user = await User.findOne({ email: emailOrUsername });
         if (!user) {
@@ -183,7 +180,7 @@ module.exports = {
         throw new UserInputError('Password is incorrect. Please try again');
       }
 
-      // TODO: Return LoginRegisterResponse typeDefs
+      // Return LoginRegisterResponse typeDefs
       const token = generateToken(user._id, TOKEN_EXP_DURATION);
       return {
         userId: user._id,
@@ -193,7 +190,7 @@ module.exports = {
 
     // UPDATE USER DATA
     async updateUser(_, { input }, { req }) {
-      // TODO: Validate input
+      // Validate input
       let { valid, errors, validatedInput } = validateUpdate(input);
       if (!valid) {
         for (let e of errors) {
@@ -201,7 +198,7 @@ module.exports = {
         }
       }
 
-      // TODO: Get token, obtain userId
+      // Get token, obtain userId
       const token = req.headers.authorization;
       if (!token) {
         throw new UserInputError('No Authorization Token Provided');
@@ -218,12 +215,11 @@ module.exports = {
       }
       const userId = decoded.id;
 
-      // TODO: Check username & email in DB
+      // Check username & email in DB
       // If it exists, EXCEPT when it's this user's username or email, throw error
       const { username, fullname, email, bio, location } = validatedInput;
-      const checkUsername = await User.findOne({ username: username });
+      const checkUsername = await User.findOne({ username });
       if (checkUsername) {
-        console.log('checkUsername: ', checkUsername);
         if (checkUsername._id != userId) {
           throw new UserInputError(
             `Username: "@${username}" already exists. Please pick another username`
@@ -232,7 +228,6 @@ module.exports = {
       }
       const checkEmailUser = await User.findOne({ email: email });
       if (checkEmailUser) {
-        console.log(checkEmailUser);
         if (checkEmailUser._id != userId) {
           throw new UserInputError(
             `Email: "${email}" already registered. Please pick other email`
@@ -240,7 +235,7 @@ module.exports = {
         }
       }
 
-      // TODO: User data from DB & Update
+      // User data from DB & Update
       const user = await User.findById(userId);
       if (!user) {
         throw new UserInputError('No such account exists. Please login again');
@@ -251,7 +246,7 @@ module.exports = {
       user.bio = bio;
       user.location = location;
 
-      // TODO: Save to DB & Return to client
+      // Save to DB & Return to client
       const newUser = await user.save();
       const { password, _id, __v, ...rest } = newUser._doc;
       const result = {
@@ -259,7 +254,6 @@ module.exports = {
         id: newUser._doc._id,
       };
 
-      console.log('UPDATE USER SUCCESS: ', result);
       return result;
     },
 
@@ -267,7 +261,7 @@ module.exports = {
     async followUser(_, { id }, { req }) {
       // client : the one requested to follow a user
       // user   : to be followed
-      // TODO: Check token, get the client's ID
+      // Check token, get the client's ID
       const token = req.headers.authorization;
       const { valid, errors, decoded } = validateToken(token);
       if (!valid) {
@@ -275,7 +269,7 @@ module.exports = {
           throw new ApolloError(err);
         }
       }
-      // TODO: Get client data from DB
+      // Get client data from DB
       const clientId = decoded.id;
       if (clientId == id) {
         throw new ApolloError("Requester's ID is the same as User ID");
@@ -288,40 +282,39 @@ module.exports = {
       }
       const clientFollowing = client._doc.following;
 
-      // TODO: Check user: if not has been followed
+      // Check user: if not has been followed
       if (clientFollowing.includes(id)) {
         throw new ApolloError('You have followed this User');
       }
 
-      // TODO: Check user: if exists
+      // Check user: if exists
       const user = await User.findById(id);
       if (!user) {
         throw new ApolloError(
-          "This account doesn't exist. Please try another ID"
+          "This account doesn't exist. Please try another user"
         );
       }
 
-      // TODO: Add user's ID to client's following array
+      // Add user's ID to client's following array
       client.following.push(user._doc._id);
       const clientUpdate = await client.save();
       if (!clientUpdate) {
         throw new ApolloError('SERVER ERROR');
       }
 
-      // TODO: Add client's ID to user's followers array
+      // Add client's ID to user's followers array
       user.followers.push(client._doc._id);
       const userUpdate = await user.save();
       if (!userUpdate) {
         throw new ApolloError('SERVER ERROR');
       }
 
-      // TODO: Return client's new data
-      const { _id, __v, ...rest } = clientUpdate._doc;
+      // Return client's new data
+      const { _id, __v, password, ...rest } = clientUpdate._doc;
       const result = {
         ...rest,
         id: clientUpdate._doc._id,
       };
-      console.log('RESULT AFTER FOLLOW USER: ', result);
       return result;
     },
 
@@ -329,52 +322,50 @@ module.exports = {
     async unfollowUser(_, { id }, { req }) {
       // client : the one requested to follow a user
       // user   : to be unfollowed
-      // TODO: Check token, get the client's ID
+      // Check token, get the client's ID
       const token = req.headers.authorization;
       const { valid, errors, decoded } = validateToken(token);
       if (!valid) {
         for (err of errors) {
-          throw new ApolloError(err);
+          throw new UserInputError(err);
         }
       }
-      // TODO: Get client data from DB
+      // Get client data from DB
       const clientId = decoded.id;
       if (clientId == id) {
-        throw new ApolloError("Requester's ID is the same as User ID");
+        throw new UserInputError("Requester's ID is the same as User ID");
       }
       const client = await User.findById(clientId);
       if (!client) {
-        throw new ApolloError(
+        throw new UserInputError(
           "Requester's account doesn't exist. Please login"
         );
       }
       const clientFollowing = client._doc.following;
 
-      // TODO: Check user: if not has NOT been followed
+      // Check user: if not has NOT been followed
       if (!clientFollowing.includes(id)) {
-        throw new ApolloError('You have NOT followed this User');
+        throw new UserInputError('You have NOT followed this User');
       }
 
-      // TODO: Check user: if exists
+      // Check user: if exists
       const user = await User.findById(id);
       if (!user) {
-        throw new ApolloError(
-          "This account doesn't exist. Please try another ID"
+        throw new UserInputError(
+          "This account doesn't exist. Please try another user"
         );
       }
 
-      // TODO: Remove user's ID from client's following array
+      // Remove user's ID from client's following array
       client.following = client.following.filter(
         (item) => item.str != user._doc._id.str
       );
-      console.log('user._doc._id: ', user._doc._id);
-      console.log('client.following: ', client.following);
       const clientUpdate = await client.save();
       if (!clientUpdate) {
         throw new ApolloError('SERVER ERROR');
       }
 
-      // TODO: Add client's ID to user's followers array
+      // Remove client's ID to user's followers array
       user.followers = user.followers.filter(
         (item) => item.str != client._doc._id.str
       );
@@ -383,13 +374,12 @@ module.exports = {
         throw new ApolloError('SERVER ERROR');
       }
 
-      // TODO: Return client's new data
-      const { _id, __v, ...rest } = clientUpdate._doc;
+      // Return client's new data
+      const { _id, __v, password, ...rest } = clientUpdate._doc;
       const result = {
         ...rest,
         id: clientUpdate._doc._id,
       };
-      console.log('RESULT AFTER UNFOLLOW USER: ', result);
       return result;
     },
 
@@ -442,19 +432,17 @@ module.exports = {
       // Hash newPassword
       const hashedPwd = await hashPassword(newPassword);
       if (!hashedPwd) {
-        console.log('Hashing password failed');
         throw new ApolloError('SERVER ERROR');
       }
 
       // Update user, with password = newPassword hashed
       user.password = hashedPwd;
       const res = await user.save();
-      const { password, _id, ...newUser } = res._doc;
+      const { password, _id, __v, ...newUser } = res._doc;
       const result = {
         ...newUser,
         id: res._doc._id,
       };
-      console.log('SUCCESS CHANGING PASSWORD: ', result);
       return result;
     },
 
@@ -480,19 +468,18 @@ module.exports = {
         throw new UserInputError('User Account does not exist');
       }
 
-      // TODO: Upload image to S3
-      // uploadImageS3 has to take array
+      // Upload image to S3
+      // uploadImageS3 has to take an array
       const { success, images: uploadRes } = await uploadImageS3([image]);
       if (!success) {
         throw new ApolloError(`Failed to upload ${type} image `);
       }
-      console.log('uploadRes uploadPersonalPicture: ', uploadRes);
       const imgUrl = uploadRes[0].url;
       if (!imgUrl || imgUrl.length === 0) {
         throw new ApolloError('SERVER ERROR');
       }
 
-      // TODO: Pass the imgUrl to DB
+      // Pass the imgUrl to DB
       switch (type) {
         case 'profile-picture':
           user.profilePictureUrl = imgUrl;
@@ -504,14 +491,12 @@ module.exports = {
           break;
       }
       const res = await user.save();
-      console.log('res from uploadPicture: ', res);
 
       const { password, _id, __v, ...rest } = res._doc;
       const result = {
         ...rest,
         id: res._doc._id,
       };
-      console.log('uploadPersonalPicture result to client: ', result);
 
       return result;
     },

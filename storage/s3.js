@@ -22,17 +22,3 @@ module.exports.s3 = s3;
 module.exports.s3DefaultParams = {
   Bucket: bucketName,
 };
-
-// Uploads an image to S3
-// module.exports.uploadFileToS3 = async (file) => {
-//   const params = {
-//     Bucket: bucketName,
-//     Body: fileStream,
-//     Key: file.filename,
-//   };
-
-//   const res = await s3.upload(params).promise();
-//   return res;
-// };
-
-// Gets an image from S3

@@ -21,6 +21,7 @@ const LoginInput = () => {
         value={emailOrUsername}
         onChange={(e) => onValueChange(e, setEmailOrUsername)}
       />
+
       <input
         type='password'
         placeholder='Password'

@@ -1,4 +1,7 @@
 .errorCard {
+  position: absolute;
+  left: 0;
+  right: 0;
   background-color: red;
   color: white;
   margin: 1rem auto;

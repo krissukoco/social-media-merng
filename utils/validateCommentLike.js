@@ -4,6 +4,7 @@ module.exports.validateComment = (commentText, token) => {
   let valid = false;
   let errors = [];
   let userId;
+
   // Token => get user id
   const tokenValidation = validateToken(token);
   console.log('tokenValidation: ', tokenValidation);

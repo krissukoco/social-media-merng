@@ -13,6 +13,8 @@ import {
 import LoadingSpinner from '../components/utils/LoadingSpinner';
 import ErrorCard from '../components/utils/ErrorCard';
 import SuccessCard from '../components/utils/SuccessCard';
+import PasswordTooltip from '../components/utils/PasswordTooltip';
+import { onGraphqlError } from '../utils/handleAPIError';
 import styles from '../styles/Settings.module.css';
 import noProfpic from '../media/no-profpic.png';
 import noBackgroundImg from '../media/no-background.jpg';
@@ -31,6 +33,7 @@ const Settings = () => {
     new: '',
     confirm: '',
   });
+  const [showPasswordTooltip, setShowPasswordTooltip] = useState(false);
   const [newProfpic, setNewProfpic] = useState();
   const [newBgImage, setNewBgImage] = useState();
 
@@ -42,9 +45,7 @@ const Settings = () => {
     setError();
   };
 
-  console.log('Changed: ', changed);
-  console.log('ERROR: ', error);
-  console.log('newProfpic: ', newProfpic);
+  let timer;
 
   const isTempDifferent = () => {
     return JSON.stringify(user) === JSON.stringify(userTemp);
@@ -71,6 +72,7 @@ const Settings = () => {
       setUserTemp(user);
     }
     setIsLoading(false);
+    clearTimeout(timer);
   }, [user]);
 
   useEffect(() => {
@@ -85,7 +87,7 @@ const Settings = () => {
 
   const onSuccess = () => {
     setSuccess(true);
-    setTimeout(() => setSuccess(false), 2000);
+    timer = setTimeout(() => setSuccess(false), 2000);
     setChanged(false);
   };
 
@@ -95,10 +97,12 @@ const Settings = () => {
   ] = useMutation(UPDATE_USER, {
     onCompleted: (data) => {
       if (data) {
-        console.log('updateUser data: ', data);
         setUser(data.updateUser);
         onSuccess();
       }
+    },
+    onError: (err) => {
+      onGraphqlError(err, setError, timer);
     },
   });
 
@@ -108,12 +112,14 @@ const Settings = () => {
   ] = useMutation(CHANGE_PASSWORD, {
     onCompleted: (data) => {
       if (data) {
-        // TODO: Show SUCCESS Card
-        console.log('After Changing Password: ', data);
+        // Show SUCCESS Card
         setUser(data.changePassword);
         setPassword({ old: '', new: '', confirm: '' });
         onSuccess();
       }
+    },
+    onError: (err) => {
+      onGraphqlError(err, setError, timer);
     },
   });
 
@@ -123,12 +129,13 @@ const Settings = () => {
   ] = useMutation(UPLOAD_PERSONAL_PICTURE, {
     onCompleted: (data) => {
       if (data) {
-        // TODO: Show SUCCESS Card
-        console.log('After UPLOAD picture', data);
+        // Show SUCCESS Card
         const user = data.uploadPersonalPicture;
-        // setUser(data.uploadPersonalPicture);
         setUserTemp({ ...userTemp, profilePictureUrl: user.profilePictureUrl });
       }
+    },
+    onError: (err) => {
+      onGraphqlError(err, setError, timer);
     },
   });
 
@@ -137,21 +144,6 @@ const Settings = () => {
     let load = updateLoading || pwdLoading;
     setIsLoading(load);
   }, [updateLoading, pwdLoading]);
-
-  // Handle error state from graphql mutation
-  useEffect(() => {
-    for (let e of [picError, pwdError, updateError]) {
-      // console.log('ERROR: ', e);
-      if (e !== undefined && e) {
-        let errorText = e.graphQLErrors[0].message;
-        // console.log('ERROR CHECK: ', errorText);
-        setError(errorText);
-      }
-    }
-    // if (!picError && !pwdError && !updateError) {
-    //   setError(null);
-    // }
-  }, [picError, pwdError, updateError]);
 
   // Helper functions
   const onDetailChange = (e, key) => {
@@ -194,7 +186,7 @@ const Settings = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    // TODO: Update personal images first
+    // Update personal images first
     const config = {
       context: { headers: { authorization: token } },
       fetchPolicy: 'no-cache',
@@ -228,10 +220,9 @@ const Settings = () => {
       }
     }
 
-    // TODO: Then update the selected fields
+    // Then update the selected fields
     const { username, fullname, email, bio, location } = userTemp;
     const input = { username, fullname, email, bio, location };
-    console.log('Upload vars: ', input);
     try {
       updateUser({
         variables: { input },
@@ -259,7 +250,6 @@ const Settings = () => {
       newPassword: password.new,
       confirmPassword: password.confirm,
     };
-    console.log('Change Pwd vars: ', vars);
     changePassword({
       variables: vars,
       context: {
@@ -268,9 +258,6 @@ const Settings = () => {
       fetchPolicy: 'no-cache',
     });
   };
-
-  console.log('User on Settings.js: ', user);
-  console.log('userTemp: ', userTemp);
   if (!userTemp) {
     return (
       <div>
@@ -291,6 +278,14 @@ const Settings = () => {
       : userTemp.bgPictureUrl
       ? userTemp.bgPictureUrl
       : noBackgroundImg;
+
+  const onPasswordFocused = () => {
+    setShowPasswordTooltip(true);
+  };
+
+  const onPasswordUnfocused = () => {
+    setShowPasswordTooltip(false);
+  };
 
   return (
     user && (
@@ -402,6 +397,7 @@ const Settings = () => {
                   placeholder='e.g. "Sport enthusiast. Liverpool FC fan"; "Competitive basketball player"; "Junior Chess Champion at 15 years old"'
                 />
               </div>
+
               <div className={styles.changesContainer}>
                 <button
                   onClick={saveChangeHandler}
@@ -418,7 +414,10 @@ const Settings = () => {
                   {isLoading ? <LoadingSpinner /> : 'Cancel All'}
                 </button>
               </div>
-              <div className={styles.changePassword}>
+              <div
+                className={styles.changePassword}
+                style={{ position: 'relative' }}
+              >
                 <h2
                   style={{
                     fontSize: '1.1rem',
@@ -444,7 +443,16 @@ const Settings = () => {
                     placeholder='Old Password'
                   />
                 </div>
-                <div className={styles.inputGroup}>
+                {showPasswordTooltip ? (
+                  <PasswordTooltip
+                    style={{ top: 0, transform: 'translateY(-100%)' }}
+                  />
+                ) : null}
+                <div
+                  onFocus={onPasswordFocused}
+                  onBlur={onPasswordUnfocused}
+                  className={styles.inputGroup}
+                >
                   <p>New Password</p>
                   <input
                     type='password'

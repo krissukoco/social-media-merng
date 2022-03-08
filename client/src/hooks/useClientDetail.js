@@ -16,7 +16,7 @@ const useClientDetail = (initialValue) => {
       },
     },
     onError: (err) => {
-      console.log('useClientDetail error: ', err);
+      throw new Error(err.graphQLErrors[0].message);
     },
     onCompleted: (data) => {
       setUserDetail(data.getSelf);

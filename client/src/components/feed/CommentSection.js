@@ -5,12 +5,6 @@ import styles from '../../styles/Comment.module.css';
 import useUserDetail from '../../hooks/useUserDetail';
 import noProfpic from '../../media/no-profpic.png';
 
-// TODO: Sort comments by recently created
-// TODO: getUser(id) from GraphQL to get user's details
-// TODO: LIMIT the comments shown to be 5, add Load More...
-// TODO: Set the comment design
-// =====
-
 // === COMPONENTS ===
 const CommentItem = ({ comment }) => {
   const userId = comment.user;

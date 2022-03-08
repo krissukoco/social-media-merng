@@ -25,9 +25,13 @@ import LoadingButton from '../components/utils/LoadingButton';
 import LoadingFull from '../components/utils/LoadingFull';
 import LoadingSpinner from '../components/utils/LoadingSpinner';
 
-// TODO: Style EmptyPage as placeholder while waiting for data
+// EmptyPage as placeholder while waiting for data
 const EmptyPage = () => {
-  return <div>EMPTY</div>;
+  return (
+    <div>
+      <LoadingFull />
+    </div>
+  );
 };
 
 const FollowButton = ({ handler }) => {
@@ -67,18 +71,13 @@ const User = () => {
   const [posts, setPosts] = useState([]);
   const [token, setToken] = useState();
 
-  console.log('clientDetail: ', clientDetail);
-
   useEffect(() => {
     const { _, token: t } = getLocalData();
     setToken(t);
   }, []);
 
   useEffect(() => {
-    console.log('clientDetail in useEffect: '.clientDetail);
     let clientFollowing = clientDetail && clientDetail.following;
-    console.log('clientFollowing: ', clientFollowing);
-
     if (clientFollowing && clientFollowing.includes(userId)) {
       setIsFollowing(true);
     }
@@ -153,7 +152,6 @@ const User = () => {
   };
 
   useEffect(() => {
-    console.log('followData: ', followData);
     if (followData) {
       setClientDetail(followData.followUser);
       setIsFollowing(true);
@@ -185,7 +183,6 @@ const User = () => {
   };
 
   useEffect(() => {
-    console.log('unfollowData: ', unfollowData);
     if (unfollowData) {
       setClientDetail(unfollowData.unfollowUser);
       setIsFollowing(false);
@@ -258,8 +255,7 @@ const User = () => {
                       </a>
                     </div>
                     <div className={`${styles.rowCentered} ${styles.flexRow}`}>
-                      {/* TODO: Make button only visible if not the user itself */}
-                      {/* TODO: Make "Followed" button if already following this user (and are not themselves) */}
+                      {/* Button types: Follow, Followed, Edit Profile */}
                       {followLoading || unfollowLoading ? (
                         <LoadingButton />
                       ) : clientDetail.id == userId ? (

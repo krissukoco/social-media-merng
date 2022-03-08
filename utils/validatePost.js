@@ -10,7 +10,7 @@ module.exports.validateCreatePost = (input, token) => {
   let poll;
   let images = input.images;
   let errors = [];
-  // TODO: NOT EMPTY: postType, body, token
+  // NOT EMPTY: postType, body, token
   if (input.postType.length === 0) {
     errors.push('postType should not be empty');
   }
@@ -21,9 +21,8 @@ module.exports.validateCreatePost = (input, token) => {
     errors.push('token should not be empty');
   }
 
-  // TODO: Token => get user id
+  // Token => get user id
   const tokenValidation = validateToken(token);
-  console.log('tokenValidation: ', tokenValidation);
   if (!tokenValidation.valid) {
     for (let e in tokenValidation.errors) {
       errors.push(e);
@@ -33,7 +32,7 @@ module.exports.validateCreatePost = (input, token) => {
     userId = decodedData.id;
   }
 
-  // TODO: If postType === "image", then images should not be empty
+  // If postType === "image", then images should not be empty
   if (input.postType == 'image') {
     if (!input.images || input.images == 0) {
       errors.push('images should not be empty');
@@ -42,14 +41,7 @@ module.exports.validateCreatePost = (input, token) => {
     images = [];
   }
 
-  // TODO: If postType === "poll", then poll should not be empty
-  if (input.postType == 'poll') {
-    if (!input.poll || input.poll.choices.length == 0) {
-      errors.push('Poll object is not present or incorrect');
-    }
-  }
-
-  // TODO: Set validatedData
+  // Set validatedData
   const validatedInput = {
     postType: input.postType,
     body: input.body,
@@ -67,7 +59,6 @@ module.exports.validateDeletePost = (token, userId) => {
   let errors = [];
 
   const tokenValidation = validateToken(token);
-  console.log('tokenValidation delete post: ', tokenValidation);
   if (!tokenValidation.valid) {
     for (let e in tokenValidation.errors) {
       errors.push(e);
@@ -77,11 +68,9 @@ module.exports.validateDeletePost = (token, userId) => {
     tokenUserId = decodedData.id;
   }
 
-  // TODO: User ID from token is the same by ID provided
+  // User ID from token is the same by ID provided
   if (userId !== tokenUserId) {
-    console.log('userId: ', userId);
-    console.log('tokenUserId: ', tokenUserId);
-    errors.push(`The user ${tokenUserId} has no authorization to delete post`);
+    errors.push(`You HAVE NO authorization to delete post`);
   }
 
   const valid = errors.length == 0 ? true : false;
@@ -92,5 +81,3 @@ module.exports.validateDeletePost = (token, userId) => {
     errors,
   };
 };
-
-// TODO: UPDATE POST (optional)

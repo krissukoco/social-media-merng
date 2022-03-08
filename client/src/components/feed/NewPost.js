@@ -20,12 +20,11 @@ const NewPost = ({ userDetail, onNewPost }) => {
   const [images, setImages] = useState([]);
   const [poll, setPoll] = useState();
 
+  // Get token
   useEffect(() => {
     const { _, token: t } = getLocalData();
     setToken(t);
   }, []);
-
-  console.log('SUCCESS POSTING: ', success);
 
   const getPostType = () => {
     let postType = 'standard';
@@ -55,11 +54,16 @@ const NewPost = ({ userDetail, onNewPost }) => {
   };
 
   // Posting related
-  const [createPost, { data, loading, error: err }] = useMutation(CREATE_POST);
+  const onGraphqlError = (error) => {
+    let err = error.graphQLErrors[0].message;
+    return err;
+  };
+  const [createPost, { data, loading, error: err }] = useMutation(CREATE_POST, {
+    onError: onGraphqlError,
+  });
 
   const onDataReturned = (data) => {
     if (data) {
-      console.log(data);
       setError();
       setText('');
       setImages([]);
@@ -75,8 +79,6 @@ const NewPost = ({ userDetail, onNewPost }) => {
       onDataReturned(data);
     }
   }, [data]);
-
-  if (err) console.log(err);
 
   const successText = 'Success posting!';
 

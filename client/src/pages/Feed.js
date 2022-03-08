@@ -41,9 +41,6 @@ const Feed = () => {
   const { userDetail, _ } = useContext(UserContext);
   const [successDelete, setSuccessDelete] = useState(false);
 
-  console.log('isLoading: ', loading);
-  console.log('posts: ', posts);
-
   useEffect(() => {
     if (postsData && !loading) {
       setPosts(postsData);
