@@ -74,7 +74,6 @@ module.exports.validateDeletePost = (token, userId) => {
   }
 
   const valid = errors.length == 0 ? true : false;
-  console.log('From validateDeletePost: ', valid, errors);
 
   return {
     valid,

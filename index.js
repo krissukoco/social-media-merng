@@ -1,19 +1,21 @@
 const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
 const express = require('express');
-const { GraphQLUpload, graphqlUploadExpress } = require('graphql-upload');
+const { graphqlUploadExpress } = require('graphql-upload');
+const path = require('path');
 require('dotenv').config();
 
-const Post = require('./models/Post');
-const User = require('./models/User');
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const MONGODB_URL = process.env.MONGODB_URL;
+
+// Static assets if in production env
 
 async function startServer() {
   try {
     await mongoose.connect(MONGODB_URL);
+
     const server = new ApolloServer({
       typeDefs,
       resolvers,
@@ -21,6 +23,9 @@ async function startServer() {
     });
     const app = express();
     app.use(graphqlUploadExpress());
+    app.get('*', (req, res) => {
+      res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+    });
 
     await server.start();
     server.applyMiddleware({ app });

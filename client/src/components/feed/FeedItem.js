@@ -148,7 +148,7 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
       <div
         className={styles.feedItemContainer}
         style={{
-          maxHeight: openComments ? 'fit-content' : 'max-content',
+          maxHeight: openComments || alwaysOpen ? 'fit-content' : 'max-content',
           transition: 'max-height 2s',
         }}
       >
@@ -235,9 +235,7 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (!alwaysOpen) {
-                  setOpenComments(!openComments);
-                }
+                setOpenComments(!openComments);
               }}
             >
               <CommentIcon
@@ -251,8 +249,8 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
           {/* Comments section */}
           <div
             style={{
-              opacity: openComments ? '1' : '0',
-              maxHeight: openComments ? 'fit-content' : '0',
+              opacity: openComments || alwaysOpen ? '1' : '0',
+              maxHeight: openComments || alwaysOpen ? 'fit-content' : '0',
               transition: 'all 0.5s',
               overflow: 'hidden',
             }}

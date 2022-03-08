@@ -9,7 +9,7 @@ import { GRAPHQL_SERVER } from './public.config';
 
 const client = new ApolloClient({
   link: createUploadLink({
-    uri: GRAPHQL_SERVER,
+    uri: '/graphql',
   }),
   cache: new InMemoryCache(),
 });

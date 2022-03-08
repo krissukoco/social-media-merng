@@ -202,7 +202,7 @@ module.exports = {
         return response;
       } catch (e) {
         console.error(e.message);
-        throw new ApolloError('Cannot update the post: ', e.message);
+        throw new ApolloError('CANNOT UPDATE the post: ', e.message);
       }
     },
 

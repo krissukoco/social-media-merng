@@ -227,3 +227,19 @@ a:hover {
 .postIsDeleted > h2 > a {
   color: var(--primary-blue-color);
 }
+
+/* Phones */
+@media only screen and (max-width: 450px) {
+  .feedContainer {
+    flex-direction: column;
+  }
+  .feed {
+    width: 100%;
+    padding: 0 0.5rem;
+  }
+  .leftBar {
+    width: 90%;
+    justify-content: center;
+    margin: auto;
+  }
+}

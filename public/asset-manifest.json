@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/static/css/main.7dc66c21.css",
+    "main.js": "/static/js/main.bcaba5ef.js",
+    "static/media/sportify-home-img-1.jpg": "/static/media/sportify-home-img-1.c4378269f6205213af62.jpg",
+    "static/media/sportify-home-img-7.jpg": "/static/media/sportify-home-img-7.db21da93154c59e87c5c.jpg",
+    "static/media/sportify-home-img-2.jpg": "/static/media/sportify-home-img-2.9a7d3f6126a5f05c004d.jpg",
+    "static/media/sportify-login-background.jpg": "/static/media/sportify-login-background.00cd9d1613fb18e4fefa.jpg",
+    "static/media/no-background.jpg": "/static/media/no-background.e06fe96bba61166501a9.jpg",
+    "static/media/sportify-home-img-5.jpg": "/static/media/sportify-home-img-5.3947859e3be41166a59e.jpg",
+    "static/media/sportify-home-img-3.jpg": "/static/media/sportify-home-img-3.4839ae6bc59e38ed547b.jpg",
+    "static/media/sportify-home-img-4.jpg": "/static/media/sportify-home-img-4.619a05038c43b8ad8ae5.jpg",
+    "static/media/sportify-home-img-6.jpg": "/static/media/sportify-home-img-6.12a49fb631f8b1920eac.jpg",
+    "static/media/logo-horizontal.png": "/static/media/logo-horizontal.6a561e59fd203bfa4b9e.png",
+    "static/media/loading-spinner.gif": "/static/media/loading-spinner.6a4a76af3bd1611c0e74.gif",
+    "static/media/no-profpic.png": "/static/media/no-profpic.0d14c6999b4a5c8e86a7.png",
+    "index.html": "/index.html",
+    "main.7dc66c21.css.map": "/static/css/main.7dc66c21.css.map",
+    "main.bcaba5ef.js.map": "/static/js/main.bcaba5ef.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7dc66c21.css",
+    "static/js/main.bcaba5ef.js"
+  ]
+}
