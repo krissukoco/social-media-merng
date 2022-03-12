@@ -194,7 +194,7 @@ const User = () => {
     return null;
   }
 
-  return userDetail && clientDetail ? (
+  return userDetail ? (
     <MainLayout>
       <div className={styles.page}>
         {userDetail == null ? (
@@ -256,15 +256,17 @@ const User = () => {
                     </div>
                     <div className={`${styles.rowCentered} ${styles.flexRow}`}>
                       {/* Button types: Follow, Followed, Edit Profile */}
-                      {followLoading || unfollowLoading ? (
-                        <LoadingButton />
-                      ) : clientDetail.id == userId ? (
-                        <EditProfileButton />
-                      ) : !clientDetail ? null : !isFollowing ? (
-                        <FollowButton handler={onFollow} />
-                      ) : (
-                        <FollowedButton handler={onUnfollow} />
-                      )}
+                      {clientDetail ? (
+                        followLoading || unfollowLoading ? (
+                          <LoadingButton />
+                        ) : clientDetail.id == userId ? (
+                          <EditProfileButton />
+                        ) : !clientDetail ? null : !isFollowing ? (
+                          <FollowButton handler={onFollow} />
+                        ) : (
+                          <FollowedButton handler={onUnfollow} />
+                        )
+                      ) : null}
                     </div>
                   </div>
                 </div>
