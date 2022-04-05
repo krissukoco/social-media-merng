@@ -21,7 +21,7 @@ const CommentItem = ({ comment }) => {
   return (
     user && (
       <div className={`${styles.commentItem}`}>
-        <div style={{ margin: '0 0.5rem' }}>
+        <div className={styles.imgContainer}>
           <img
             src={profpic}
             alt={user.fullname}
@@ -29,7 +29,9 @@ const CommentItem = ({ comment }) => {
           />
         </div>
         <div style={{ margin: '0 0.5rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}
+          >
             <h1 className={styles.commentItemFullname}>{user.fullname}</h1>
             <a href={`/user/${user.id}`} className={styles.commentItemUsername}>
               @{user.username}

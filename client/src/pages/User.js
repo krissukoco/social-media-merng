@@ -214,7 +214,7 @@ const User = () => {
                   />
                 </div>
                 <div className={styles.detailContainer}>
-                  <div style={{ minWidth: '420px' }}>
+                  <div className={styles.detailLeft}>
                     <div className={styles.fullname}>{userDetail.fullname}</div>
                     <div className={styles.username}>
                       @{userDetail.username}

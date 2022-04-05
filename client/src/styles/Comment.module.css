@@ -6,12 +6,6 @@
 .commentSection {
   padding: 1rem 0;
 }
-/* 
-.commentSection.open {
-  opacity: 1;
-  display: block;
-  transition: opacity 0.5s ease-in-out;
-} */
 
 .commentItem {
   padding: 1rem 0.5rem;
@@ -29,12 +23,18 @@
   object-fit: cover;
 }
 
+.imgContainer {
+  min-width: max-content;
+  padding: 0 0.5rem;
+}
+
 /* NewComment */
 .newCommentProfPic {
   width: 40px;
   height: 40px;
   margin-right: 1rem;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .newCommentTextArea {
@@ -93,4 +93,12 @@
 .commentItemUsername {
   font-size: 0.9rem;
   color: var(--primary-blue);
+}
+
+/* Phones */
+@media only screen and (max-width: 450px) {
+  .newComment {
+    width: 100%;
+    padding: 1rem;
+  }
 }

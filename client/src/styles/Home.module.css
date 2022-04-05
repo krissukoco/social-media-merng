@@ -86,3 +86,18 @@
   background-color: whitesmoke;
   transition: 0.3s ease-in-out;
 }
+
+/* Phones */
+@media only screen and (max-width: 450px) {
+  .mainContainer {
+    display: flex;
+    flex-direction: column;
+  }
+  .imageSection {
+    margin: 2rem 2rem;
+    min-width: 200px;
+  }
+  .headingText {
+    padding-bottom: 2rem;
+  }
+}

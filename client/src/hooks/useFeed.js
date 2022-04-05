@@ -11,13 +11,15 @@ const useFeed = (limit) => {
   const [posts, setPosts] = useState([]);
   const [latestPosts, setLatestPosts] = useState([]);
   const [followingPosts, setFollowingPosts] = useState([]);
-  const [token, setToken] = useState();
+  const [token, setToken] = useState(getLocalData().token);
 
   let loading = true;
   let error = null;
 
+  console.log('Token from useFeed: ', token);
+
   useEffect(() => {
-    const { _, token: localToken } = getLocalData();
+    const { token: localToken } = getLocalData();
     setToken(localToken);
     setPosts([...latestPosts]);
   }, []);

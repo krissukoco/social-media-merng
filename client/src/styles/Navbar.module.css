@@ -139,3 +139,20 @@ a:hover {
   min-height: 0.5rem;
   border-bottom: 0.5px solid lightgrey;
 }
+
+/* Phones */
+@media only screen and (max-width: 450px) {
+  .myButton {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.9rem;
+    height: fit-content;
+    margin: auto 0.5rem;
+  }
+  .logo {
+    width: 180px;
+  }
+  .navbar {
+    padding: 0.2rem 1rem;
+    align-content: center;
+  }
+}

@@ -102,3 +102,17 @@
   color: white;
   transition: 0.3s ease-in-out;
 }
+
+/* Phones */
+@media only screen and (max-width: 450px) {
+  .imgContainer {
+    visibility: hidden;
+  }
+  .mainContainer {
+    max-width: 100%;
+    min-width: 100%;
+    min-height: 500px;
+    padding: 1rem 2rem;
+    margin: 2rem auto;
+  }
+}

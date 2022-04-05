@@ -1,4 +1,5 @@
 const { UserInputError, ApolloError } = require('apollo-server');
+const mongoose = require('mongoose');
 
 const User = require('../../models/User');
 const Post = require('../../models/Post');
@@ -79,7 +80,7 @@ module.exports = {
         return posts;
       }
       for (let u of followingId) {
-        let res = await Post.find({ user: u }); // array of posts
+        let res = await Post.find({ user: mongoose.Types.ObjectId(u) }); // array of posts
         for (let p of res) {
           const { _id, __v, ...result } = p._doc;
           posts.push({

@@ -38,10 +38,6 @@ a:hover {
   padding: 0 2rem;
 }
 
-/* .rightBar {
-  width: 15%;
-} */
-
 .postBody:focus {
   min-height: 5rem;
   transition: all 10s;
@@ -131,6 +127,18 @@ a:hover {
   outline: 0.5px solid rgba(211, 211, 211, 0.3);
   box-shadow: 3px 3px 2px rgba(211, 211, 211, 0.3);
   transition: 0.5s;
+}
+
+.profpicContainer {
+  padding: 0;
+  min-width: fit-content;
+}
+
+.profpic {
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .itemDetails {
@@ -233,6 +241,17 @@ a:hover {
   .feedContainer {
     flex-direction: column;
   }
+
+  .feedItemContainer {
+    padding: 0.5rem 0.5rem;
+    margin: 2rem auto;
+  }
+
+  .profpic {
+    width: 45px;
+    height: 45px;
+  }
+
   .feed {
     width: 100%;
     padding: 0 0.5rem;

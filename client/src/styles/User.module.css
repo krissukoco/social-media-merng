@@ -87,6 +87,10 @@
   padding: 0 1rem 0 0;
 }
 
+.detailLeft {
+  max-width: 420px;
+}
+
 /* PICS */
 
 .headerImg {
@@ -221,4 +225,32 @@
   font-size: 0.9rem;
   padding: 0 0.25rem;
   color: var(--light-grey);
+}
+
+/* Phones */
+@media only screen and (max-width: 450px) {
+  .page {
+    min-height: 700px;
+  }
+  .headerImg {
+    height: 170px;
+  }
+  .detailContainer {
+    flex-direction: column;
+  }
+  .profilePictureContainer {
+    width: 80px;
+    height: 80px;
+    margin-top: -50px;
+  }
+  .profilePicture {
+    width: 70px;
+    height: 70px;
+  }
+  .followContainer {
+    margin-top: 1rem;
+  }
+  .userContainer {
+    padding: 0 1.2rem;
+  }
 }

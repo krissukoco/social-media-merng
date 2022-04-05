@@ -126,3 +126,22 @@
   padding: 0.25rem 0.5rem;
   float: right;
 }
+
+/* Phones */
+@media only screen and (max-width: 450px) {
+  .container {
+    margin-top: 1rem;
+    padding: 1rem;
+  }
+  .profilePicture {
+    width: 40px;
+    height: 40px;
+    margin-right: 0.5rem;
+  }
+  .optionsContainer {
+    padding: 0;
+  }
+  .postButton {
+    padding: 0.5rem 1rem;
+  }
+}

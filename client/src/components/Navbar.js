@@ -16,7 +16,12 @@ export default function Navbar({ userDetail }) {
         <nav className={styles.navbar}>
           <div>
             <a href='/'>
-              <img src={logo} alt='sportify logo' width='180' />
+              <img
+                src={logo}
+                alt='sportify logo'
+                width='180'
+                className={styles.logo}
+              />
             </a>
           </div>
           <div className={styles.navMenu}>

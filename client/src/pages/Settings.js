@@ -335,7 +335,7 @@ const Settings = () => {
                 className={styles.profilePicture}
                 alt={`Sportify Sport Social Media | ${userTemp.fullname}`}
               />
-              <div>
+              <div className={styles.changeProfpicContainer}>
                 <input
                   ref={profilePictureInput}
                   id='profilePictureInput'

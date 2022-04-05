@@ -152,16 +152,11 @@ const FeedItem = ({ feed, alwaysOpen, onFeedDeleted }) => {
           transition: 'max-height 2s',
         }}
       >
-        <a style={{ padding: '0 0rem' }} href={`/user/${userDetail.id}`}>
+        <a className={styles.profpicContainer} href={`/user/${userDetail.id}`}>
           <img
             src={profpic}
             alt={userDetail.fullname}
-            style={{
-              width: '55px',
-              height: '50px',
-              objectFit: 'cover',
-              borderRadius: '50%',
-            }}
+            className={styles.profpic}
           />
         </a>
 
